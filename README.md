@@ -1,5 +1,5 @@
 # This is our 2026 Game Jam Game
 
-## **Contributors: **
+## **Contributors:**
 - Eaven Ball
 - Caden Sinclair
