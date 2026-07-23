@@ -316,8 +316,12 @@ MonoBehaviour:
   moveBackwardKey: 33
   moveRightKey: 18
   jumpKey: 1
-  moveSpeed: 10
+  moveSpeed: 15
   jumpForce: 7
+  maxRunSpeed: 30
+  acceleration: 1.2
+  deceleration: 7
+  brakeSpeed: 1.35
   groundCheck: {fileID: 2122804639}
   groundMask:
     serializedVersion: 2

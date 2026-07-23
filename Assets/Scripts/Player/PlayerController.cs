@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+
     [Header("Keybinds")]
     public Key moveForwardKey = Key.W;
     public Key moveLeftKey = Key.A;
@@ -11,8 +12,15 @@ public class PlayerController : MonoBehaviour
     public Key jumpKey = Key.Space;
 
     [Header("Movement Settings")]
-    public float moveSpeed = 10f;
+    public float moveSpeed = 15f;
     public float jumpForce = 7f;
+    public float maxRunSpeed = 30f;
+
+    [Header("Momentum & Physics")]
+    public float acceleration = 2f;
+    public float inputDeceleration = 8f;
+    public float groundFriction = 0.5f;
+    public float brakeSpeed = 6f;
 
     [Header("Ground Check")]
     public Transform groundCheck;
@@ -22,24 +30,26 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private bool isGrounded;
 
-    private float moveX;
-    private float moveZ;
+    private float currentMoveX = 0f;
+    private float currentMoveZ = 0f;
 
     private PlayerCameraController camController;
 
     void Start()
     {
+
         rb = GetComponent<Rigidbody>();
-        // Finds camera controller anywhere attached to children or parent setup safely
         camController = GetComponentInChildren<PlayerCameraController>();
         if (camController == null)
         {
             camController = Camera.main.GetComponent<PlayerCameraController>();
         }
+
     }
 
     private void Update()
     {
+
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (Keyboard.current[jumpKey].wasPressedThisFrame && isGrounded)
@@ -47,13 +57,39 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
         }
 
-        moveX = 0f;
-        moveZ = 0f;
+        // --- MOMENTUM CALCULATIONS ---
+        float targetX = 0f;
+        float targetZ = 0f;
 
-        if (Keyboard.current[moveLeftKey].isPressed) moveX = -1f;
-        if (Keyboard.current[moveRightKey].isPressed) moveX = 1f;
-        if (Keyboard.current[moveBackwardKey].isPressed) moveZ = -1f;
-        if (Keyboard.current[moveForwardKey].isPressed) moveZ = 1f;
+        if (Keyboard.current[moveLeftKey].isPressed) targetX = -1f;
+        if (Keyboard.current[moveRightKey].isPressed) targetX = 1f;
+        if (Keyboard.current[moveBackwardKey].isPressed) targetZ = -1f;
+        if (Keyboard.current[moveForwardKey].isPressed) targetZ = 1f;
+
+        // Process Z-Axis
+        if (targetZ == 0f)
+        {
+            currentMoveZ = Mathf.MoveTowards(currentMoveZ, 0f, inputDeceleration * Time.deltaTime);
+        }
+        else if (targetZ < 0f && currentMoveZ > 0.05f)
+        {
+            currentMoveZ = Mathf.MoveTowards(currentMoveZ, 0f, brakeSpeed * Time.deltaTime);
+        }
+        else
+        {
+            currentMoveZ = Mathf.MoveTowards(currentMoveZ, targetZ, acceleration * Time.deltaTime);
+        }
+
+        // Process X-Axis
+        if (targetX == 0f)
+        {
+            currentMoveX = Mathf.MoveTowards(currentMoveX, 0f, inputDeceleration * Time.deltaTime);
+        }
+        else
+        {
+            currentMoveX = Mathf.MoveTowards(currentMoveX, targetX, acceleration * Time.deltaTime);
+        }
+
     }
 
     private void FixedUpdate()
@@ -62,21 +98,64 @@ public class PlayerController : MonoBehaviour
 
         if (camController != null && camController.IsThirdPerson)
         {
-            // Calculate direction using the RAW un-flipped mouse tracking rotation
-            // This guarantees that looking back completely ignores movement vectors
             Quaternion baseCamRotation = Quaternion.Euler(0f, camController.GetCleanYRotation, 0f);
-
             Vector3 camForward = baseCamRotation * Vector3.forward;
             Vector3 camRight = baseCamRotation * Vector3.right;
 
-            direction = camRight * moveX + camForward * moveZ;
+            direction = (camRight * currentMoveX) + (camForward * currentMoveZ);
         }
         else
         {
-            // First person fallback
-            direction = transform.right * moveX + transform.forward * moveZ;
+            direction = (transform.right * currentMoveX) + (transform.forward * currentMoveZ);
         }
 
-        rb.linearVelocity = new Vector3(direction.normalized.x * moveSpeed, rb.linearVelocity.y, direction.normalized.z * moveSpeed);
+        if (direction.magnitude > 1f)
+        {
+            direction.Normalize();
+        }
+
+        Vector3 desiredHorizontalVelocity = new Vector3(direction.x * moveSpeed, 0f, direction.z * moveSpeed);
+
+        Vector3 currentHorizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+
+        bool isMovingInputActive = (Keyboard.current[moveForwardKey].isPressed ||
+                                    Keyboard.current[moveBackwardKey].isPressed ||
+                                    Keyboard.current[moveLeftKey].isPressed ||
+                                    Keyboard.current[moveRightKey].isPressed);
+
+        bool isBraking = Keyboard.current[moveBackwardKey].isPressed && currentMoveZ > 0.05f;
+
+        float blendRate;
+        if (isBraking)
+        {
+            blendRate = brakeSpeed;
+        }
+        else if (isMovingInputActive)
+        {
+            blendRate = acceleration;
+        }
+        else
+        {
+            blendRate = groundFriction;
+        }
+
+        Vector3 finalHorizontalVelocity = Vector3.MoveTowards(currentHorizontalVelocity, desiredHorizontalVelocity, blendRate * moveSpeed * Time.fixedDeltaTime);
+
+        if (finalHorizontalVelocity.magnitude > maxRunSpeed)
+        {
+            float dot = Vector3.Dot(desiredHorizontalVelocity.normalized, finalHorizontalVelocity.normalized);
+            if (dot > 0)
+            {
+                finalHorizontalVelocity = currentHorizontalVelocity;
+            }
+        }
+        else
+        {
+            finalHorizontalVelocity = Vector3.ClampMagnitude(finalHorizontalVelocity, maxRunSpeed);
+        }
+
+        rb.linearVelocity = new Vector3(finalHorizontalVelocity.x, rb.linearVelocity.y, finalHorizontalVelocity.z);
+
     }
+
 }

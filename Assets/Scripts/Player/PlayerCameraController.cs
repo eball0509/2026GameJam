@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerCameraController : MonoBehaviour
 {
+
     [Header("Look Settings")]
     public float mouseSense = 4f;
     public Transform playerBody;
@@ -44,6 +45,7 @@ public class PlayerCameraController : MonoBehaviour
 
     void Start()
     {
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         defaultLocalPosition = transform.localPosition;
@@ -52,10 +54,12 @@ public class PlayerCameraController : MonoBehaviour
         {
             playerMovement = playerBody.GetComponent<PlayerController>();
         }
+
     }
 
     void Update()
     {
+
         if (Keyboard.current[togglePerspectiveKey].wasPressedThisFrame)
         {
             isThirdPerson = !isThirdPerson;
@@ -78,10 +82,12 @@ public class PlayerCameraController : MonoBehaviour
         }
 
         yRotation += clampedX * mouseSense * 0.01f;
+
     }
 
     void LateUpdate()
     {
+
         bool isMoving = false;
         if (playerMovement != null)
         {
@@ -93,12 +99,10 @@ public class PlayerCameraController : MonoBehaviour
 
         if (!isThirdPerson)
         {
-            // First Person: Lock player body to camera mouse rotation instantly
             playerBody.localRotation = Quaternion.Euler(0f, yRotation, 0f);
         }
         else if (isMoving)
         {
-            // Third Person Moving: Calculate desired movement direction angle and smoothly rotate character body to face it
             float moveInputX = 0f;
             float moveInputZ = 0f;
 
@@ -116,6 +120,7 @@ public class PlayerCameraController : MonoBehaviour
                 Quaternion targetBodyRotation = Quaternion.LookRotation(moveDirection);
                 playerBody.rotation = Quaternion.Slerp(playerBody.rotation, targetBodyRotation, characterTurnSpeed * Time.deltaTime);
             }
+
         }
 
         // Animate looking behind
@@ -129,7 +134,6 @@ public class PlayerCameraController : MonoBehaviour
         currentHeightOffset = Mathf.Lerp(currentHeightOffset, targetHeight, perspectiveSwitchSpeed * Time.deltaTime);
         currentPitchOffset = Mathf.Lerp(currentPitchOffset, targetPitch, perspectiveSwitchSpeed * Time.deltaTime);
 
-        // The camera ALWAYS relies on the mouse tracking rotation base (yRotation) while in third person
         float finalCameraY = isThirdPerson ? yRotation : playerBody.eulerAngles.y;
         transform.rotation = Quaternion.Euler(xRotation + currentPitchOffset, finalCameraY + currentCameraY, 0f);
 
