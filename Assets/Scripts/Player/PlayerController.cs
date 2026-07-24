@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement Settings")]
     public float moveSpeed = 15f;
-    public float jumpForce = 7f;
+    public float jumpForce = 12f; // Boosted slightly to match snappier gravity
     public float maxRunSpeed = 30f;
 
     [Header("Momentum & Physics")]
@@ -26,10 +26,21 @@ public class PlayerController : MonoBehaviour
     public float groundFriction = 0.5f;
     public float brakeSpeed = 6f;
 
+    [Header("Air Control & Gravity (Snappiness)")]
+    [Tooltip("Extra gravity applied while rising up in a jump.")]
+    public float gravityMultiplier = 2f;
+    [Tooltip("Extra gravity applied while falling down. Higher = snappy fast drops.")]
+    public float fallGravityMultiplier = 3.5f;
+    [Tooltip("How much directional control the player has in mid-air (0 = full momentum lock, 1 = same as ground).")]
+    [Range(0.05f, 1f)]
+    public float airControlFactor = 0.4f;
+
     [Header("Ground Check")]
     public Transform groundCheck;
     public LayerMask groundMask;
     public float groundDistance = 0.4f;
+
+    public bool IsGrounded => isGrounded;
 
     private Rigidbody rb;
     private bool isGrounded;
@@ -43,12 +54,15 @@ public class PlayerController : MonoBehaviour
     private Coroutine boostCoroutine;
 
     private PlayerCameraController camController;
+    private PlayerMovementModifiers movementModifiers;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        movementModifiers = GetComponent<PlayerMovementModifiers>();
+
         camController = GetComponentInChildren<PlayerCameraController>();
-        if (camController == null)
+        if (camController == null && Camera.main != null)
         {
             camController = Camera.main.GetComponent<PlayerCameraController>();
         }
@@ -62,12 +76,25 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        if (Keyboard.current[jumpKey].wasPressedThisFrame && isGrounded)
+        // Ground Check
+        if (groundCheck != null)
         {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+            isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        }
+
+        // Single Master Jump Handler
+        if (Keyboard.current[jumpKey].wasPressedThisFrame)
+        {
+            // 1. Priority: Wall Bounce if touching wall mid-air
+            if (!isGrounded && movementModifiers != null && movementModifiers.IsWallSliding)
+            {
+                movementModifiers.PerformWallBounce();
+            }
+            // 2. Priority: Normal Ground Jump
+            else if (isGrounded)
+            {
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+            }
         }
 
         // --- MOMENTUM CALCULATIONS ---
@@ -107,6 +134,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 direction;
 
+        // Calculate movement direction relative to camera or player transform
         if (camController != null && camController.IsThirdPerson)
         {
             Quaternion baseCamRotation = Quaternion.Euler(0f, camController.GetCleanYRotation, 0f);
@@ -126,6 +154,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Isolate the current actual physical horizontal speed
+        Vector3 desiredHorizontalVelocity = new Vector3(direction.x * moveSpeed, 0f, direction.z * moveSpeed);
         Vector3 currentHorizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float currentSpeedMagnitude = currentHorizontalVelocity.magnitude;
 
@@ -146,9 +175,15 @@ public class PlayerController : MonoBehaviour
         else if (isMovingInputActive) blendRate = acceleration;
         else blendRate = groundFriction;
 
-        Vector3 finalHorizontalVelocity = Vector3.MoveTowards(currentHorizontalVelocity, desiredHorizontalVelocity, blendRate * activeMoveSpeed * Time.fixedDeltaTime);
+        // REDUCE AIR CONTROL: If in air, dampen input reactivity so jumps preserve launch direction
+        if (!isGrounded)
+        {
+            blendRate *= airControlFactor;
+        }
 
-        // Clamping check against the current dynamic maximum speed limits
+        Vector3 finalHorizontalVelocity = Vector3.MoveTowards(currentHorizontalVelocity, desiredHorizontalVelocity, blendRate * moveSpeed * Time.fixedDeltaTime);
+
+        // Speed clamping
         if (finalHorizontalVelocity.magnitude > currentMaxSpeed)
         {
             float dot = Vector3.Dot(desiredHorizontalVelocity.normalized, finalHorizontalVelocity.normalized);
@@ -162,7 +197,43 @@ public class PlayerController : MonoBehaviour
             finalHorizontalVelocity = Vector3.ClampMagnitude(finalHorizontalVelocity, currentMaxSpeed);
         }
 
-        rb.linearVelocity = new Vector3(finalHorizontalVelocity.x, rb.linearVelocity.y, finalHorizontalVelocity.z);
+        // --- INSTANT WALL FRICTION OVERRIDE ---
+        Vector3 targetHorizontalVelocity = finalHorizontalVelocity;
+
+        if (movementModifiers != null && movementModifiers.IsWallSliding)
+        {
+            Vector3 wallNormal = movementModifiers.WallNormal;
+
+            // Check if our current velocity is pushing into the wall face
+            float inwardSpeed = Vector3.Dot(targetHorizontalVelocity, -wallNormal);
+            if (inwardSpeed > 0f)
+            {
+                targetHorizontalVelocity += wallNormal * inwardSpeed;
+            }
+
+            targetHorizontalVelocity += -wallNormal * 0.2f;
+        }
+
+        // --- CUSTOM GRAVITY MODIFIER (FIXES FLOATINESS) ---
+        // Don't apply extra downward force if wall sliding
+        bool isWallSliding = movementModifiers != null && movementModifiers.IsWallSliding;
+
+        if (!isGrounded && !isWallSliding)
+        {
+            if (rb.linearVelocity.y < 0)
+            {
+                // Falling: Apply heavy downward force to snap back to ground quickly
+                rb.AddForce(Physics.gravity * (fallGravityMultiplier - 1f), ForceMode.Acceleration);
+            }
+            else if (rb.linearVelocity.y > 0)
+            {
+                // Rising: Apply moderate extra gravity for a punchy arc
+                rb.AddForce(Physics.gravity * (gravityMultiplier - 1f), ForceMode.Acceleration);
+            }
+        }
+
+        // Apply clean horizontal velocity, preserving gravity Y acceleration
+        rb.linearVelocity = new Vector3(targetHorizontalVelocity.x, rb.linearVelocity.y, targetHorizontalVelocity.z);
     }
 
     public void ApplySpeedOverboost(float boostedMaxSpeed, float boostedAccel, float decayDuration, float holdDuration = 0.5f)
@@ -214,4 +285,12 @@ public class PlayerController : MonoBehaviour
 
     public void Die() { Debug.Log("You Died"); }
 
+    private void OnDrawGizmosSelected()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = isGrounded ? Color.green : Color.red;
+            Gizmos.DrawWireSphere(groundCheck.position, groundDistance);
+        }
+    }
 }
