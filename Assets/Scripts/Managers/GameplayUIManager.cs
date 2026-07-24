@@ -26,7 +26,7 @@ public class GameplayUIManager : MonoBehaviour
     [SerializeField] private float bigTickInterval = 15f;
     [Tooltip("Distance between marked small intervals (5, 10, 20, 25).")]
     [SerializeField] private float smallTickInterval = 5f;
-    [SerializeField] float textInwardOffset = 0f;
+    [SerializeField] float textInwardOffset = 12f;
 
     [Header("Speedometer Angle Settings")]
     public float zeroSpeedAngle = 135f;
