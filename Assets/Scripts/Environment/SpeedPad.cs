@@ -18,15 +18,12 @@ public class SpeedPad : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Try getting PlayerController from entering object
         PlayerController player = other.GetComponentInParent<PlayerController>();
 
         if (player != null)
         {
-            // 1. Trigger acceleration & max speed decay coroutine on player
             player.ApplySpeedOverboost(peakMaxSpeed, peakAcceleration, decayDuration);
 
-            // 2. Instantly launch player's velocity past 30 speed
             Rigidbody rb = player.GetComponent<Rigidbody>();
             if (rb != null)
             {
@@ -38,15 +35,12 @@ public class SpeedPad : MonoBehaviour
                 }
                 else
                 {
-                    // Use player's current velocity direction, or player's facing direction if stationary
                     launchDir = rb.linearVelocity.magnitude > 0.1f ? rb.linearVelocity.normalized : player.transform.forward;
                 }
 
-                // Flatten vertical component to prevent flying up
                 launchDir.y = 0f;
                 launchDir.Normalize();
 
-                // Instantly set velocity to the boosted speed
                 rb.linearVelocity = new Vector3(launchDir.x * peakMaxSpeed, rb.linearVelocity.y, launchDir.z * peakMaxSpeed);
             }
         }
