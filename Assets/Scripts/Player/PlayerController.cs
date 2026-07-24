@@ -11,6 +11,10 @@ public class PlayerController : MonoBehaviour
     public Key moveRightKey = Key.D;
     public Key jumpKey = Key.Space;
 
+    [Header("Health")]
+    public int maxHealth = 1;
+    public int currentHealth;
+
     [Header("Movement Settings")]
     public float moveSpeed = 15f;
     public float jumpForce = 7f;
@@ -49,7 +53,8 @@ public class PlayerController : MonoBehaviour
             camController = Camera.main.GetComponent<PlayerCameraController>();
         }
 
-        // Cache original base limits
+        currentHealth = maxHealth;
+
         originalMaxRunSpeed = maxRunSpeed;
         originalAcceleration = acceleration;
         currentMaxSpeed = maxRunSpeed;
@@ -74,7 +79,6 @@ public class PlayerController : MonoBehaviour
         if (Keyboard.current[moveBackwardKey].isPressed) targetZ = -1f;
         if (Keyboard.current[moveForwardKey].isPressed) targetZ = 1f;
 
-        // Process Z-Axis
         if (targetZ == 0f)
         {
             currentMoveZ = Mathf.MoveTowards(currentMoveZ, 0f, inputDeceleration * Time.deltaTime);
@@ -88,7 +92,6 @@ public class PlayerController : MonoBehaviour
             currentMoveZ = Mathf.MoveTowards(currentMoveZ, targetZ, acceleration * Time.deltaTime);
         }
 
-        // Process X-Axis
         if (targetX == 0f)
         {
             currentMoveX = Mathf.MoveTowards(currentMoveX, 0f, inputDeceleration * Time.deltaTime);
@@ -200,6 +203,19 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         return horizontalVelocity.magnitude;
+    }
+
+    public void TakeDamage(int damageAmount)
+    {
+        currentHealth -= damageAmount;
+        currentHealth = Mathf.Max(0, currentHealth);
+
+        if (currentHealth <= 0) Die();
+    }
+
+    public void Die()
+    {
+        Debug.Log("You Died");
     }
 
 }
