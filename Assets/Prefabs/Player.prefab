@@ -183,8 +183,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCameraController
   mouseSense: 4
   playerBody: {fileID: 10351000118030479}
-  lookBehindKey: 17
-  togglePerspectiveKey: 36
   lookBehindPanSpeed: 15
   thirdPersonDistance: 4
   perspectiveSwitchSpeed: 10
@@ -212,7 +210,7 @@ GameObject:
   - component: {fileID: 8536114606666023606}
   - component: {fileID: 5198849394958370324}
   - component: {fileID: 272182535065704340}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -355,11 +353,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99c9ba90b82eeb34582506f0aa0b0e81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveForwardKey: 37
-  moveLeftKey: 15
-  moveBackwardKey: 33
-  moveRightKey: 18
-  jumpKey: 1
   maxHealth: 1
   currentHealth: 0
   moveSpeed: 15

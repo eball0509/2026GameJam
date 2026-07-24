@@ -27,6 +27,12 @@ public class MainMenuManager : MonoBehaviour
         if (levelSelectCanvasUI != null) levelSelectCanvasUI.SetActive(false);
     }
 
+    // FIX: Allows the LevelSelectManager to shut off the title screen on return
+    public void DisableTitlePanel()
+    {
+        if (titleMenuPanel != null) titleMenuPanel.SetActive(false);
+    }
+
     public void OnPlayClicked()
     {
         if (titleMenuPanel != null) titleMenuPanel.SetActive(false);
@@ -55,7 +61,6 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    // Accept an optional boolean rule (defaults to true if called without parameters elsewhere)
     public void EnableLevelSelectUI(bool shouldFade = true)
     {
         if (levelSelectCanvasUI != null)
@@ -68,7 +73,6 @@ public class MainMenuManager : MonoBehaviour
             }
             else
             {
-                // Force it to be completely visible immediately without triggering a loop transition
                 CanvasGroup group = levelSelectCanvasUI.GetComponent<CanvasGroup>();
                 if (group != null) group.alpha = 1f;
             }

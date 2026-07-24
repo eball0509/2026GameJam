@@ -2256,6 +2256,9 @@ MonoBehaviour:
   levelSummary: A short jump through the block valley.
   totalCollectiblesCount: 3
   sceneTargetName: Scene_Tutorial
+  goldTimeTarget: 15
+  silverTimeTarget: 30
+  bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
   uniqueCollectibleSprites: []
   performanceMedals: []
@@ -5022,6 +5025,9 @@ MonoBehaviour:
   levelSummary: A short jump through the block valley.
   totalCollectiblesCount: 3
   sceneTargetName: Scene_Tutorial
+  goldTimeTarget: 15
+  silverTimeTarget: 30
+  bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
   uniqueCollectibleSprites: []
   performanceMedals: []
@@ -8579,6 +8585,9 @@ MonoBehaviour:
   levelSummary: A short jump through the block valley.
   totalCollectiblesCount: 3
   sceneTargetName: Scene_Tutorial
+  goldTimeTarget: 15
+  silverTimeTarget: 30
+  bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
   uniqueCollectibleSprites: []
   performanceMedals: []
@@ -14000,10 +14009,16 @@ MonoBehaviour:
   levelName: Tutorial
   levelSummary: A short jump through the block valley.
   totalCollectiblesCount: 3
-  sceneTargetName: TestSceneC
+  sceneTargetName: TestLevel
+  goldTimeTarget: 15
+  silverTimeTarget: 30
+  bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
   uniqueCollectibleSprites: []
-  performanceMedals: []
+  performanceMedals:
+  - {fileID: 21300000, guid: b01e85c96186e6e4996cf33ea8205c5f, type: 3}
+  - {fileID: 21300000, guid: 956a54fd70086eb4ea7d4c8a1e301463, type: 3}
+  - {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   panelAnchor: {fileID: 1631581729}
   hoverScaleFactor: 1.15
   scalingSpeed: 12
@@ -15012,7 +15027,10 @@ MonoBehaviour:
   levelName: 2
   levelSummary: A short jump through the block valley.
   totalCollectiblesCount: 3
-  sceneTargetName: Scene_Tutorial
+  sceneTargetName: Level2
+  goldTimeTarget: 15
+  silverTimeTarget: 30
+  bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
   uniqueCollectibleSprites: []
   performanceMedals: []

@@ -12,9 +12,16 @@ public class LevelMapNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [Tooltip("The exact name of the Unity Scene file to load for this specific level.")]
     [SerializeField] private string sceneTargetName = "Scene_Tutorial";
 
+    [Header("Medal Targets (Clear Time in Seconds)")]
+    [Tooltip("Ensure these targets match the ones set in your LevelManager script exactly!")]
+    public float goldTimeTarget = 15f;
+    public float silverTimeTarget = 30f;
+    public float bronzeTimeTarget = 45f;
+
     [Header("Visual Configs (Unique to this Level)")]
     [SerializeField] private Sprite fullLevelImage;
     [SerializeField] private Sprite[] uniqueCollectibleSprites;
+    [Tooltip("Ensure array layout is: Element 0 = Bronze, Element 1 = Silver, Element 2 = Gold")]
     [SerializeField] private Sprite[] performanceMedals;
 
     [Header("Placement Positioning")]
@@ -73,6 +80,11 @@ public class LevelMapNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         }
     }
 
+    public void RefreshUnlockState()
+    {
+        CheckUnlockProgression();
+    }
+
     private void Update()
     {
         if (!isUnlocked) return;
@@ -93,21 +105,36 @@ public class LevelMapNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     private void OnNodeClicked()
     {
+        TriggerNodeSelection();
+    }
+
+    public void TriggerNodeSelection()
+    {
         if (!isUnlocked || detailsPanel == null) return;
 
         int gemsFound = PlayerPrefs.GetInt(levelName + "_Collectibles", 0);
         float bestTime = PlayerPrefs.GetFloat(levelName + "_BestTime", 0.0f);
 
-        int medalRank = PlayerPrefs.GetInt(levelName + "_MedalRank", 0);
+        // FIX: Dynamically calculate the visual medal status from historical best time records
         Sprite earnedMedalSprite = null;
-        if (medalRank > 0 && medalRank <= performanceMedals.Length)
+        if (bestTime > 0f && performanceMedals != null && performanceMedals.Length >= 3)
         {
-            earnedMedalSprite = performanceMedals[medalRank - 1];
+            if (bestTime <= goldTimeTarget)
+            {
+                earnedMedalSprite = performanceMedals[2]; // Gold (Index 2)
+            }
+            else if (bestTime <= silverTimeTarget)
+            {
+                earnedMedalSprite = performanceMedals[1]; // Silver (Index 1)
+            }
+            else if (bestTime <= bronzeTimeTarget)
+            {
+                earnedMedalSprite = performanceMedals[0]; // Bronze (Index 0)
+            }
         }
 
         Vector3 targetPanelPos = panelAnchor != null ? panelAnchor.position : transform.position;
 
-        // Passing sceneTargetName to the OpenPanel function setup
         detailsPanel.OpenPanel(
             levelName,
             levelSummary,
@@ -146,8 +173,9 @@ public class LevelMapNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     {
         PlayerPrefs.SetInt("Unlocked_" + levelName, 1);
         PlayerPrefs.SetInt(levelName + "_Collectibles", totalCollectiblesCount);
-        PlayerPrefs.SetFloat(levelName + "_BestTime", 12.34f);
-        PlayerPrefs.SetInt(levelName + "_MedalRank", 3);
+        PlayerPrefs.SetFloat(levelName + "_BestTime", goldTimeTarget - 1f); // Forces Gold Time threshold range
+        PlayerPrefs.Save();
+        Debug.Log("<color=green>DevCheat:</color> Injected Max Stats Data Profile!");
     }
 
     [ContextMenu("DEBUG: Reset ALL Game Saves")]

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class LevelSelectManager : MonoBehaviour
@@ -20,15 +21,68 @@ public class LevelSelectManager : MonoBehaviour
 
     private CameraState currentState = CameraState.AtTitle;
     private Vector3 specificTargetPosition;
-
-    // Tracks if we need to run the UI fade routine
     private bool comingFromMainMenu = false;
 
     private void Start()
     {
-        transform.position = titlePosition;
-        transform.rotation = Quaternion.Euler(titleRotation);
-        currentState = CameraState.AtTitle;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        string lastPlayedLevel = PlayerPrefs.GetString("LastPlayedLevel", "");
+
+        if (!string.IsNullOrEmpty(lastPlayedLevel))
+        {
+            // Clear the key immediately
+            PlayerPrefs.SetString("LastPlayedLevel", "");
+            PlayerPrefs.Save();
+
+            // Snap camera directly to the map position
+            transform.position = mapPosition;
+            transform.rotation = Quaternion.Euler(mapRotation);
+            currentState = CameraState.AtMap;
+
+            // Force Title screen OFF and Level Select canvas ON immediately
+            if (mainMenuManager != null)
+            {
+                mainMenuManager.DisableTitlePanel();
+                mainMenuManager.EnableLevelSelectUI(false);
+            }
+
+            // Start the initialization delay loop to let UI systems wake up
+            StartCoroutine(ReturnToNodeRoutine(lastPlayedLevel));
+        }
+        else
+        {
+            transform.position = titlePosition;
+            transform.rotation = Quaternion.Euler(titleRotation);
+            currentState = CameraState.AtTitle;
+        }
+    }
+
+    private IEnumerator ReturnToNodeRoutine(string lastPlayedLevelName)
+    {
+        // Wait two full frames to ensure the Canvas UI Hierarchy is fully turned on,
+        // UI graphics elements have processed layout bounds, and Awake/Start loops have run.
+        yield return null;
+        yield return null;
+
+        LevelMapNode[] allNodes = FindObjectsByType<LevelMapNode>();
+
+        // 1. Explicitly force all nodes to read their updated PlayerPrefs
+        foreach (LevelMapNode node in allNodes)
+        {
+            node.RefreshUnlockState();
+        }
+
+        // 2. Find the active node matching the target name and call selection panel logic
+        foreach (LevelMapNode node in allNodes)
+        {
+            if (node.levelName.Equals(lastPlayedLevelName, System.StringComparison.OrdinalIgnoreCase))
+            {
+                node.TriggerNodeSelection();
+                break;
+            }
+        }
     }
 
     private void Update()
@@ -39,7 +93,6 @@ public class LevelSelectManager : MonoBehaviour
             {
                 if (mainMenuManager != null)
                 {
-                    // If we came from the main menu, do a fresh fade. Otherwise, skip the fade!
                     mainMenuManager.EnableLevelSelectUI(comingFromMainMenu);
                 }
             });
@@ -71,7 +124,7 @@ public class LevelSelectManager : MonoBehaviour
 
     public void StartMenuZoomTransition()
     {
-        comingFromMainMenu = true; // Yes, we want the nice intro fade!
+        comingFromMainMenu = true;
         currentState = CameraState.ZoomingToMap;
     }
 
@@ -87,7 +140,7 @@ public class LevelSelectManager : MonoBehaviour
     {
         if (detailsPanel != null) detailsPanel.ClosePanel();
 
-        comingFromMainMenu = false; // False! We are just backing away from a level node, skip the fade.
+        comingFromMainMenu = false;
         specificTargetPosition = mapPosition;
         currentState = CameraState.ZoomingToMap;
     }
