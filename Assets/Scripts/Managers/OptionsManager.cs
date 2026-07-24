@@ -28,6 +28,7 @@ public class OptionsManager : MonoBehaviour
     public static Key MoveBackward { get; private set; } = Key.S;
     public static Key MoveRight { get; private set; } = Key.D;
     public static Key Jump { get; private set; } = Key.Space;
+    public static Key Roll { get; private set; } = Key.LeftCtrl;
     public static Key LookBehind { get; private set; } = Key.C;
     public static Key TogglePerspective { get; private set; } = Key.V;
 
