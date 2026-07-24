@@ -33,11 +33,15 @@ public class PlayerController : MonoBehaviour
     private float currentMoveX = 0f;
     private float currentMoveZ = 0f;
 
+    private float originalMaxRunSpeed;
+    private float originalAcceleration;
+    private float currentMaxSpeed;
+    private Coroutine boostCoroutine;
+
     private PlayerCameraController camController;
 
     void Start()
     {
-
         rb = GetComponent<Rigidbody>();
         camController = GetComponentInChildren<PlayerCameraController>();
         if (camController == null)
@@ -45,6 +49,10 @@ public class PlayerController : MonoBehaviour
             camController = Camera.main.GetComponent<PlayerCameraController>();
         }
 
+        // Cache original base limits
+        originalMaxRunSpeed = maxRunSpeed;
+        originalAcceleration = acceleration;
+        currentMaxSpeed = maxRunSpeed;
     }
 
     private void Update()
@@ -141,7 +149,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 finalHorizontalVelocity = Vector3.MoveTowards(currentHorizontalVelocity, desiredHorizontalVelocity, blendRate * moveSpeed * Time.fixedDeltaTime);
 
-        if (finalHorizontalVelocity.magnitude > maxRunSpeed)
+        if (finalHorizontalVelocity.magnitude > currentMaxSpeed)
         {
             float dot = Vector3.Dot(desiredHorizontalVelocity.normalized, finalHorizontalVelocity.normalized);
             if (dot > 0)
@@ -151,11 +159,47 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            finalHorizontalVelocity = Vector3.ClampMagnitude(finalHorizontalVelocity, maxRunSpeed);
+            finalHorizontalVelocity = Vector3.ClampMagnitude(finalHorizontalVelocity, currentMaxSpeed);
         }
 
         rb.linearVelocity = new Vector3(finalHorizontalVelocity.x, rb.linearVelocity.y, finalHorizontalVelocity.z);
 
+    }
+
+    public void ApplySpeedOverboost(float boostedMaxSpeed, float boostedAccel, float decayDuration)
+    {
+        if (boostCoroutine != null)
+        {
+            StopCoroutine(boostCoroutine);
+        }
+
+        boostCoroutine = StartCoroutine(DecayBoostRoutine(boostedMaxSpeed, boostedAccel, decayDuration));
+    }
+
+    private System.Collections.IEnumerator DecayBoostRoutine(float startMaxSpeed, float startAccel, float duration)
+    {
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            currentMaxSpeed = Mathf.Lerp(startMaxSpeed, originalMaxRunSpeed, t);
+            acceleration = Mathf.Lerp(startAccel, originalAcceleration, t);
+
+            yield return null;
+        }
+
+        currentMaxSpeed = originalMaxRunSpeed;
+        acceleration = originalAcceleration;
+        boostCoroutine = null;
+    }
+
+    public float GetCurrentHorizontalSpeed()
+    {
+        Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        return horizontalVelocity.magnitude;
     }
 
 }
