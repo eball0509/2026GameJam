@@ -5,6 +5,7 @@ public class PlayerSpeedTracker : MonoBehaviour
 
     private Rigidbody rb;
     private GameplayUIManager gameplayUIManager;
+    private PlayerController playerController;
 
     [Header("Speed Settings")]
     public float currentSpeed;
@@ -19,6 +20,7 @@ public class PlayerSpeedTracker : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         countdown = explodeTimer;
         gameplayUIManager = FindAnyObjectByType<GameplayUIManager>();
+        playerController = GetComponent<PlayerController>();
 
     }
 
@@ -27,6 +29,11 @@ public class PlayerSpeedTracker : MonoBehaviour
 
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
         currentSpeed = horizontalVelocity.magnitude;
+
+        if (gameplayUIManager != null && playerController != null)
+        {
+            gameplayUIManager.UpdateSpeedometerUI(currentSpeed, minimumRequiredSpeed, playerController.maxRunSpeed);
+        }
 
         if (currentSpeed < minimumRequiredSpeed)
         {

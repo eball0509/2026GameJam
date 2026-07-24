@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
 
     private float originalMaxRunSpeed;
     private float originalAcceleration;
-    private float currentMaxSpeed;
+    public float currentMaxSpeed { get; private set; }
     private Coroutine boostCoroutine;
 
     private PlayerCameraController camController;
@@ -125,9 +125,14 @@ public class PlayerController : MonoBehaviour
             direction.Normalize();
         }
 
-        Vector3 desiredHorizontalVelocity = new Vector3(direction.x * moveSpeed, 0f, direction.z * moveSpeed);
-
+        // Isolate the current actual physical horizontal speed
         Vector3 currentHorizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+        float currentSpeedMagnitude = currentHorizontalVelocity.magnitude;
+
+        // FIX: If we are actively overboosting, our target movement speed should adapt 
+        // to our current high velocity so holding W doesn't drag us back down to 15!
+        float activeMoveSpeed = Mathf.Max(moveSpeed, currentSpeedMagnitude);
+        Vector3 desiredHorizontalVelocity = new Vector3(direction.x * activeMoveSpeed, 0f, direction.z * activeMoveSpeed);
 
         bool isMovingInputActive = (Keyboard.current[moveForwardKey].isPressed ||
                                     Keyboard.current[moveBackwardKey].isPressed ||
@@ -137,21 +142,13 @@ public class PlayerController : MonoBehaviour
         bool isBraking = Keyboard.current[moveBackwardKey].isPressed && currentMoveZ > 0.05f;
 
         float blendRate;
-        if (isBraking)
-        {
-            blendRate = brakeSpeed;
-        }
-        else if (isMovingInputActive)
-        {
-            blendRate = acceleration;
-        }
-        else
-        {
-            blendRate = groundFriction;
-        }
+        if (isBraking) blendRate = brakeSpeed;
+        else if (isMovingInputActive) blendRate = acceleration;
+        else blendRate = groundFriction;
 
-        Vector3 finalHorizontalVelocity = Vector3.MoveTowards(currentHorizontalVelocity, desiredHorizontalVelocity, blendRate * moveSpeed * Time.fixedDeltaTime);
+        Vector3 finalHorizontalVelocity = Vector3.MoveTowards(currentHorizontalVelocity, desiredHorizontalVelocity, blendRate * activeMoveSpeed * Time.fixedDeltaTime);
 
+        // Clamping check against the current dynamic maximum speed limits
         if (finalHorizontalVelocity.magnitude > currentMaxSpeed)
         {
             float dot = Vector3.Dot(desiredHorizontalVelocity.normalized, finalHorizontalVelocity.normalized);
@@ -166,27 +163,30 @@ public class PlayerController : MonoBehaviour
         }
 
         rb.linearVelocity = new Vector3(finalHorizontalVelocity.x, rb.linearVelocity.y, finalHorizontalVelocity.z);
-
     }
 
-    public void ApplySpeedOverboost(float boostedMaxSpeed, float boostedAccel, float decayDuration)
+    public void ApplySpeedOverboost(float boostedMaxSpeed, float boostedAccel, float decayDuration, float holdDuration = 0.5f)
     {
         if (boostCoroutine != null)
         {
             StopCoroutine(boostCoroutine);
         }
 
-        boostCoroutine = StartCoroutine(DecayBoostRoutine(boostedMaxSpeed, boostedAccel, decayDuration));
+        boostCoroutine = StartCoroutine(DecayBoostRoutine(boostedMaxSpeed, boostedAccel, decayDuration, holdDuration));
     }
 
-    private System.Collections.IEnumerator DecayBoostRoutine(float startMaxSpeed, float startAccel, float duration)
+    private System.Collections.IEnumerator DecayBoostRoutine(float startMaxSpeed, float startAccel, float decayDuration, float holdDuration)
     {
-        float elapsed = 0f;
+        currentMaxSpeed = startMaxSpeed;
+        acceleration = startAccel;
 
-        while (elapsed < duration)
+        yield return new WaitForSeconds(holdDuration);
+
+        float elapsed = 0f;
+        while (elapsed < decayDuration)
         {
             elapsed += Time.deltaTime;
-            float t = elapsed / duration;
+            float t = elapsed / decayDuration;
 
             currentMaxSpeed = Mathf.Lerp(startMaxSpeed, originalMaxRunSpeed, t);
             acceleration = Mathf.Lerp(startAccel, originalAcceleration, t);
@@ -209,13 +209,9 @@ public class PlayerController : MonoBehaviour
     {
         currentHealth -= damageAmount;
         currentHealth = Mathf.Max(0, currentHealth);
-
         if (currentHealth <= 0) Die();
     }
 
-    public void Die()
-    {
-        Debug.Log("You Died");
-    }
+    public void Die() { Debug.Log("You Died"); }
 
 }
