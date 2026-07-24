@@ -4,6 +4,7 @@ public class PlayerSpeedTracker : MonoBehaviour
 {
 
     private Rigidbody rb;
+    private GameplayUIManager gameplayUIManager;
 
     [Header("Speed Settings")]
     public float currentSpeed;
@@ -17,6 +18,7 @@ public class PlayerSpeedTracker : MonoBehaviour
 
         rb = GetComponent<Rigidbody>();
         countdown = explodeTimer;
+        gameplayUIManager = FindAnyObjectByType<GameplayUIManager>();
 
     }
 
@@ -29,7 +31,11 @@ public class PlayerSpeedTracker : MonoBehaviour
         if (currentSpeed < minimumRequiredSpeed)
         {
             countdown -= Time.deltaTime;
-            Debug.Log($"SLOW AHH! Exploding in: {countdown:F1} seconds");
+
+            if (gameplayUIManager != null)
+            {
+                gameplayUIManager.UpdateWarningUI(true, countdown);
+            }
 
             if (countdown <= 0)
             {
@@ -39,6 +45,11 @@ public class PlayerSpeedTracker : MonoBehaviour
         else
         {
             countdown = explodeTimer;
+
+            if (gameplayUIManager != null)
+            {
+                gameplayUIManager.UpdateWarningUI(false, 0f);
+            }
         }
 
     }
