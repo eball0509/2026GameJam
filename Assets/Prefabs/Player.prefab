@@ -211,6 +211,7 @@ GameObject:
   - component: {fileID: 1409330764666153170}
   - component: {fileID: 8536114606666023606}
   - component: {fileID: 5198849394958370324}
+  - component: {fileID: 272182535065704340}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -368,6 +369,9 @@ MonoBehaviour:
   inputDeceleration: 8
   groundFriction: 0.5
   brakeSpeed: 1.35
+  gravityMultiplier: 2
+  fallGravityMultiplier: 3.5
+  airControlFactor: 0.4
   groundCheck: {fileID: 2573637328545732807}
   groundMask:
     serializedVersion: 2
@@ -388,3 +392,23 @@ MonoBehaviour:
   currentSpeed: 0
   minimumRequiredSpeed: 5
   explodeTimer: 3
+--- !u!114 &272182535065704340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3640454273839087022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 742214e7b09088046983c86517e4bfd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovementModifiers
+  entryDownwardVelocity: -1
+  maxWallSlideSpeed: 20
+  wallCheckDistance: 0.8
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 256
+  wallBounceUpForce: 12
+  wallBounceAwayForce: 14

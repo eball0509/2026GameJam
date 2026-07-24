@@ -307,6 +307,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 260109484}
   m_CullTransparentMesh: 1
+--- !u!1 &499529571 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3640454273839087022, guid: 9b6c4322e10f92741b3528cbf84c6e1f, type: 3}
+  m_PrefabInstance: {fileID: 6022096785509862824}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &756796029
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,6 +427,26 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 10351000118030479, guid: 9b6c4322e10f92741b3528cbf84c6e1f, type: 3}
   m_PrefabInstance: {fileID: 6022096785509862824}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &876797032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 499529571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 742214e7b09088046983c86517e4bfd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovementModifiers
+  entryDownwardVelocity: -1
+  maxWallSlideSpeed: 20
+  wallCheckDistance: 0.8
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 256
+  wallBounceUpForce: 12
+  wallBounceAwayForce: 14
 --- !u!1 &933376768
 GameObject:
   m_ObjectHideFlags: 0
@@ -510,7 +535,7 @@ GameObject:
   - component: {fileID: 970583626}
   - component: {fileID: 970583625}
   - component: {fileID: 970583628}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1818,7 +1843,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3640454273839087022, guid: 9b6c4322e10f92741b3528cbf84c6e1f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 876797032}
   m_SourcePrefab: {fileID: 100100000, guid: 9b6c4322e10f92741b3528cbf84c6e1f, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

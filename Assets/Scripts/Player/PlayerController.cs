@@ -154,7 +154,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Isolate the current actual physical horizontal speed
-        Vector3 desiredHorizontalVelocity = new Vector3(direction.x * moveSpeed, 0f, direction.z * moveSpeed);
+        //Vector3 desiredHorizontalVelocity = new Vector3(direction.x * moveSpeed, 0f, direction.z * moveSpeed);
         Vector3 currentHorizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         float currentSpeedMagnitude = currentHorizontalVelocity.magnitude;
 
