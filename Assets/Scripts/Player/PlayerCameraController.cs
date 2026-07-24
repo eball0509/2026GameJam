@@ -3,14 +3,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerCameraController : MonoBehaviour
 {
-
     [Header("Look Settings")]
     public float mouseSense = 4f;
     public Transform playerBody;
-
-    [Header("Camera Keybinds")]
-    public Key lookBehindKey = Key.C;
-    public Key togglePerspectiveKey = Key.V;
 
     [Header("Look Behind Settings")]
     public float lookBehindPanSpeed = 15f;
@@ -35,66 +30,59 @@ public class PlayerCameraController : MonoBehaviour
     public float GetCleanYRotation => yRotation;
 
     private bool isThirdPerson = false;
-
     private float currentCameraDistance = 0f;
     private float currentHeightOffset = 0f;
     private float currentPitchOffset = 0f;
 
     private Vector3 defaultLocalPosition;
     private PlayerController playerMovement;
+    private Camera targetCameraComponent;
 
     void Start()
     {
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         defaultLocalPosition = transform.localPosition;
+        targetCameraComponent = GetComponent<Camera>();
 
         if (playerBody != null)
         {
             playerMovement = playerBody.GetComponent<PlayerController>();
         }
-
     }
 
     void Update()
     {
-
-        if (Keyboard.current[togglePerspectiveKey].wasPressedThisFrame)
+        // LOOKUP GLOBAL BIND
+        if (Keyboard.current[OptionsManager.TogglePerspective].wasPressedThisFrame)
         {
             isThirdPerson = !isThirdPerson;
         }
 
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-
         float clampedX = Mathf.Clamp(mouseDelta.x, -100f, 100f);
         float clampedY = Mathf.Clamp(mouseDelta.y, -100f, 100f);
 
         xRotation -= clampedY * mouseSense * 0.01f;
-
-        if (isThirdPerson)
-        {
-            xRotation = Mathf.Clamp(xRotation, minThirdPersonX, maxThirdPersonX);
-        }
-        else
-        {
-            xRotation = Mathf.Clamp(xRotation, -90f, 90f);
-        }
-
+        xRotation = isThirdPerson ? Mathf.Clamp(xRotation, minThirdPersonX, maxThirdPersonX) : Mathf.Clamp(xRotation, -90f, 90f);
         yRotation += clampedX * mouseSense * 0.01f;
-
     }
 
     void LateUpdate()
     {
+        if (targetCameraComponent != null)
+        {
+            float targetFOV = isThirdPerson ? 60f : OptionsManager.FirstPersonFOV;
+            targetCameraComponent.fieldOfView = Mathf.Lerp(targetCameraComponent.fieldOfView, targetFOV, perspectiveSwitchSpeed * Time.deltaTime);
+        }
 
         bool isMoving = false;
         if (playerMovement != null)
         {
-            isMoving = Keyboard.current[playerMovement.moveForwardKey].isPressed ||
-                       Keyboard.current[playerMovement.moveLeftKey].isPressed ||
-                       Keyboard.current[playerMovement.moveBackwardKey].isPressed ||
-                       Keyboard.current[playerMovement.moveRightKey].isPressed;
+            isMoving = Keyboard.current[OptionsManager.MoveForward].isPressed ||
+                       Keyboard.current[OptionsManager.MoveLeft].isPressed ||
+                       Keyboard.current[OptionsManager.MoveBackward].isPressed ||
+                       Keyboard.current[OptionsManager.MoveRight].isPressed;
         }
 
         if (!isThirdPerson)
@@ -106,10 +94,10 @@ public class PlayerCameraController : MonoBehaviour
             float moveInputX = 0f;
             float moveInputZ = 0f;
 
-            if (Keyboard.current[playerMovement.moveLeftKey].isPressed) moveInputX = -1f;
-            if (Keyboard.current[playerMovement.moveRightKey].isPressed) moveInputX = 1f;
-            if (Keyboard.current[playerMovement.moveBackwardKey].isPressed) moveInputZ = -1f;
-            if (Keyboard.current[playerMovement.moveForwardKey].isPressed) moveInputZ = 1f;
+            if (Keyboard.current[OptionsManager.MoveLeft].isPressed) moveInputX = -1f;
+            if (Keyboard.current[OptionsManager.MoveRight].isPressed) moveInputX = 1f;
+            if (Keyboard.current[OptionsManager.MoveBackward].isPressed) moveInputZ = -1f;
+            if (Keyboard.current[OptionsManager.MoveForward].isPressed) moveInputZ = 1f;
 
             Vector3 camForward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
             Vector3 camRight = Vector3.ProjectOnPlane(transform.right, Vector3.up).normalized;
@@ -120,15 +108,13 @@ public class PlayerCameraController : MonoBehaviour
                 Quaternion targetBodyRotation = Quaternion.LookRotation(moveDirection);
                 playerBody.rotation = Quaternion.Slerp(playerBody.rotation, targetBodyRotation, characterTurnSpeed * Time.deltaTime);
             }
-
         }
 
-        // Animate looking behind
-        bool isLookingBehind = Keyboard.current[lookBehindKey].isPressed;
+        // LOOKUP GLOBAL BIND
+        bool isLookingBehind = Keyboard.current[OptionsManager.LookBehind].isPressed;
         float targetCameraY = isLookingBehind ? 180f : 0f;
         currentCameraY = Mathf.LerpAngle(currentCameraY, targetCameraY, lookBehindPanSpeed * Time.deltaTime);
 
-        // Animate offsets
         float targetHeight = isThirdPerson ? thirdPersonHeightOffset : 0f;
         float targetPitch = isThirdPerson ? thirdPersonPitchOffset : 0f;
         currentHeightOffset = Mathf.Lerp(currentHeightOffset, targetHeight, perspectiveSwitchSpeed * Time.deltaTime);
