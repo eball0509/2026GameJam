@@ -17,5 +17,20 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TestLevel.unity
     guid: 901a7e3663993294cb4af2e2c065f975
+  - enabled: 1
+    path: Assets/Scenes/Levels/Pirate.unity
+    guid: 5d1ba72a20acb714c9b652f9713dd708
+  - enabled: 1
+    path: Assets/Scenes/Levels/NIght.unity
+    guid: a273b6c64fe5af6418dad992617d1f5b
+  - enabled: 1
+    path: Assets/Scenes/Levels/Pixel.unity
+    guid: e39a9e2f6cbabe745bb68cf212f15557
+  - enabled: 1
+    path: Assets/Scenes/Levels/Toon.unity
+    guid: dcfc99a7952517243b17567b3040de29
+  - enabled: 1
+    path: Assets/Scenes/Levels/Tutorial.unity
+    guid: f6b781e89670685448801cbf6b682657
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
