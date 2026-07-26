@@ -68,6 +68,8 @@ public class PlayerController : MonoBehaviour
     private float originalColHeight;
     private Vector3 originalColCenter;
 
+    private bool isInvincible = false;
+
     public float currentMaxSpeed { get; private set; }
 
     private Coroutine boostCoroutine;
@@ -344,6 +346,11 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = new Vector3(finalHorizontalVelocity.x, rb.linearVelocity.y, finalHorizontalVelocity.z);
     }
 
+    public void SetInvincible(bool state)
+    {
+        isInvincible = state;
+    }
+
     private void PlayRandomJumpSound()
     {
         if (randomJumpEvents != null && randomJumpEvents.Length > 0)
@@ -437,10 +444,11 @@ public class PlayerController : MonoBehaviour
 
     public void Die()
     {
-        if (isDead) return;
+        // Prevent dying if already dead OR if the player is set to invincible (e.g., during victory)
+        if (isDead || isInvincible) return;
         isDead = true;
 
-        onDeath?.Invoke(); // Fire the death event instantly when dying
+        onDeath?.Invoke();
 
         Vector3 deathVelocity = rb != null ? rb.linearVelocity : Vector3.zero;
 
@@ -464,9 +472,17 @@ public class PlayerController : MonoBehaviour
         {
             camController.SwitchToRagdollTarget(ragdollCameraTarget);
         }
+
+        FindAnyObjectByType<GameEndUIManager>()?.TriggerDeathState();
+    }
+
+    public void TakeDamage(int damageAmount)
+    {
+        if (isInvincible) return; // Ignore damage entirely
+        currentHealth = Mathf.Max(0, currentHealth - damageAmount);
+        if (currentHealth <= 0) Die();
     }
 
     public float GetCurrentHorizontalSpeed() => new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z).magnitude;
-    public void TakeDamage(int damageAmount) { currentHealth = Mathf.Max(0, currentHealth - damageAmount); if (currentHealth <= 0) Die(); }
     private void OnDrawGizmosSelected() { if (groundCheck != null) { Gizmos.color = isGrounded ? Color.green : Color.red; Gizmos.DrawWireSphere(groundCheck.position, groundDistance); } }
 }

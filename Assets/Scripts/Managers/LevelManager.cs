@@ -69,9 +69,8 @@ public class LevelManager : MonoBehaviour
             PlayerPrefs.SetInt($"{levelName}_Collectible_{index}", 1);
         }
 
-        // Also save a fallback total item count for old compatibility checks
         int totalUniqueSaved = 0;
-        for (int i = 0; i < 20; i++) // Quick scan cap check
+        for (int i = 0; i < 20; i++)
         {
             if (PlayerPrefs.GetInt($"{levelName}_Collectible_{i}", 0) == 1) totalUniqueSaved++;
         }
@@ -88,9 +87,10 @@ public class LevelManager : MonoBehaviour
             PlayerPrefs.SetInt("Unlocked_" + nextLevelToUnlock, 1);
         }
 
-        PlayerPrefs.SetString("LastPlayedLevel", levelName);
+        PlayerPrefs.SetString("LastPlayedLevel", mainMenuSceneName);
         PlayerPrefs.Save();
 
-        SceneManager.LoadScene(mainMenuSceneName);
+        // --- REPLACE SceneManager.LoadScene WITH THIS ---
+        FindAnyObjectByType<GameEndUIManager>()?.TriggerWinState();
     }
 }

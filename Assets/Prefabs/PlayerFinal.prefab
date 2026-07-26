@@ -264,7 +264,7 @@ MonoBehaviour:
   currentSpeed: 0
   minimumRequiredSpeed: 5
   explodeTimer: 3
-  explosionEffectPrefab: {fileID: 0}
+  explosionEffectPrefab: {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
   explosionForce: 3
   explosionRadius: 10
   upwardModifier: 0.5
