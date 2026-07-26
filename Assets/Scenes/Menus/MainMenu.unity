@@ -5694,7 +5694,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 394.89902, y: -44.530018}
+  m_AnchoredPosition: {x: 377.7, y: -44.530018}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &498175299
@@ -21207,7 +21207,7 @@ MonoBehaviour:
   goldTimeTarget: 15
   silverTimeTarget: 30
   bronzeTimeTarget: 45
-  fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
+  fullLevelImage: {fileID: 21300000, guid: c34e3d5bdaa59984189c3d8d0393c8dc, type: 3}
   uniqueCollectibleSprites:
   - {fileID: 21300000, guid: 80c8b357c091502438532c99094dda3b, type: 3}
   - {fileID: 21300000, guid: 81b564a97aa19c24f844a59c1791779a, type: 3}
