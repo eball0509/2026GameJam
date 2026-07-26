@@ -173,7 +173,7 @@ MonoBehaviour:
   gravityMultiplier: 2
   fallGravityMultiplier: 3.5
   airControlFactor: 0.4
-  rollSpeedBoost: 35
+  rollSpeedBoost: 8
   rollDuration: 0.75
   rollCooldown: 0.4
   rollColliderHeight: 1
@@ -201,6 +201,10 @@ MonoBehaviour:
   currentSpeed: 0
   minimumRequiredSpeed: 5
   explodeTimer: 3
+  explosionEffectPrefab: {fileID: 0}
+  explosionForce: 3
+  explosionRadius: 10
+  upwardModifier: 0.5
   isTrackingActive: 0
 --- !u!114 &5300372161297975063
 MonoBehaviour:

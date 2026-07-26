@@ -11,6 +11,12 @@ public class PlayerSpeedTracker : MonoBehaviour
     public float minimumRequiredSpeed = 5f;
     public float explodeTimer = 3f;
 
+    [Header("Explosion Settings")]
+    public GameObject explosionEffectPrefab;
+    public float explosionForce = 20f;
+    public float explosionRadius = 10f;
+    public float upwardModifier = 3f;
+
     [Header("Activation Settings")]
     public bool isTrackingActive = false;
 
@@ -78,6 +84,24 @@ public class PlayerSpeedTracker : MonoBehaviour
 
     private void Explode()
     {
-        Debug.Log("You suh and died");
+        if (explosionEffectPrefab != null)
+        {
+            Instantiate(explosionEffectPrefab, transform.position, transform.rotation);
+        }
+
+        if (playerController != null)
+        {
+            playerController.Die();
+
+            // Apply explosion force to launch the player's ragdoll bones
+            Rigidbody[] rbs = GetComponentsInChildren<Rigidbody>();
+            foreach (var body in rbs)
+            {
+                if (!body.isKinematic)
+                {
+                    body.AddExplosionForce(explosionForce, transform.position, explosionRadius, upwardModifier, ForceMode.Impulse);
+                }
+            }
+        }
     }
 }

@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
 
     private bool isSkiddingTurnaround = false;
     private float turnaroundTimer = 0f;
-    private const float SKID_DURATION_LOCK = 0.3f; // Slightly shortened for punchier transitions
+    private const float SKID_DURATION_LOCK = 0.3f;
 
     private bool isWallJumpingMomentumActive = false;
     private bool wallJumpHadForwardMomentum = false;
@@ -161,7 +161,6 @@ public class PlayerController : MonoBehaviour
         {
             turnaroundTimer -= Time.deltaTime;
             if (turnaroundTimer <= 0f) isSkiddingTurnaround = false;
-            // Removed internal update return to allow real-time input gathering during skids
         }
 
         float targetX = 0f;
@@ -169,7 +168,9 @@ public class PlayerController : MonoBehaviour
 
         bool strictlyWallSliding = movementModifiers != null && movementModifiers.IsWallSliding && !movementModifiers.IsWallRunning;
 
-        if (!isRolling && !strictlyWallSliding && !isWallJumpingMomentumActive)
+        // FIXED: Removed "!isRolling" check here. This allows background inputs to continue
+        // tracking so you don't lose all your internal momentum when exiting the roll.
+        if (!strictlyWallSliding && !isWallJumpingMomentumActive)
         {
             if (Keyboard.current[OptionsManager.MoveLeft].isPressed) targetX = -1f;
             if (Keyboard.current[OptionsManager.MoveRight].isPressed) targetX = 1f;
@@ -181,7 +182,8 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
-            if (isGrounded && horizontalVelocity.magnitude > 8f && targetZ != 0f && !isSkiddingTurnaround)
+            // FIXED: Added "!isRolling" here so you don't accidentally trigger a skid animation while rolling.
+            if (!isRolling && isGrounded && horizontalVelocity.magnitude > 8f && targetZ != 0f && !isSkiddingTurnaround)
             {
                 if (camController != null && camController.IsThirdPerson)
                 {
@@ -290,8 +292,8 @@ public class PlayerController : MonoBehaviour
         }
 
         // --- MOMENTUM PRESERVATION MECHANIC ---
-        // Calculate velocity update using blended inputs rather than stopping the player outright
-        float activeMoveSpeed = Mathf.Max(moveSpeed, currentHorizontalVelocity.magnitude);
+        // FIXED: activeMoveSpeed now actively targets currentMaxSpeed during a roll, which gives you the intended burst of speed.
+        float activeMoveSpeed = isRolling ? currentMaxSpeed : Mathf.Max(moveSpeed, currentHorizontalVelocity.magnitude);
         Vector3 desiredHorizontalVelocity = direction * activeMoveSpeed;
 
         bool isMovingInputActive = isRolling || isWallRunning || (currentMaxSpeed > originalMaxRunSpeed) || (
@@ -302,7 +304,6 @@ public class PlayerController : MonoBehaviour
 
         bool isBraking = !isRolling && !isWallRunning && Keyboard.current[OptionsManager.MoveBackward].isPressed && currentMoveZ > 0.05f;
 
-        // Apply dynamic turnaround brake modifications directly to the blend calculation rather than returning early
         float blendRate = isBraking ? brakeSpeed : (isMovingInputActive ? acceleration : groundFriction);
         if (isSkiddingTurnaround) blendRate = turnaroundBrakeForce;
 
@@ -312,7 +313,8 @@ public class PlayerController : MonoBehaviour
 
         if (currentMaxSpeed > originalMaxRunSpeed && isMovingInputActive && !isRolling)
         {
-            float preservedSpeed = Mathf.Max(currentHorizontalVelocity.magnitude, moveSpeed);
+            // FIXED: Clamped preservedSpeed down to currentMaxSpeed. This forces the momentum to actually deplete alongside your decay coroutine.
+            float preservedSpeed = Mathf.Min(Mathf.Max(currentHorizontalVelocity.magnitude, moveSpeed), currentMaxSpeed);
             Vector3 blendedDirection = Vector3.RotateTowards(currentHorizontalVelocity.normalized, direction, blendRate * Time.fixedDeltaTime, 0f);
             finalHorizontalVelocity = blendedDirection * preservedSpeed;
         }
@@ -353,8 +355,6 @@ public class PlayerController : MonoBehaviour
     {
         isSkiddingTurnaround = true;
         turnaroundTimer = SKID_DURATION_LOCK;
-        // REMOVED: currentMoveX = 0f; currentMoveZ = 0f; 
-        // Keeping inputs alive allows momentum vectors to shift smoothly into the new direction.
         if (anim != null) anim.SetTrigger("TurnAroundTrigger");
     }
 
