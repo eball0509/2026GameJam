@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(CapsuleCollider))]
 public class PlayerController : MonoBehaviour
@@ -46,6 +47,11 @@ public class PlayerController : MonoBehaviour
     private Rigidbody[] ragdollRigidbodies;
     private Collider[] ragdollColliders;
     private bool isDead = false;
+
+    [Header("Audio & Events")]
+    public UnityEvent onRoll;
+    public UnityEvent[] randomJumpEvents;
+    public UnityEvent onDeath; // Added death event
 
     public bool IsGrounded => isGrounded;
     public bool IsRolling => isRolling;
@@ -142,12 +148,14 @@ public class PlayerController : MonoBehaviour
                     anim.SetTrigger("JumpTrigger");
                 }
                 isSkiddingTurnaround = false;
+                PlayRandomJumpSound();
             }
             else if (isGrounded)
             {
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
                 if (anim != null) anim.SetTrigger("JumpTrigger");
                 isSkiddingTurnaround = false;
+                PlayRandomJumpSound();
             }
         }
 
@@ -155,6 +163,7 @@ public class PlayerController : MonoBehaviour
         {
             StartCoroutine(RollRoutine());
             if (anim != null) anim.SetTrigger("RollTrigger");
+            onRoll?.Invoke();
         }
 
         if (isSkiddingTurnaround)
@@ -168,8 +177,6 @@ public class PlayerController : MonoBehaviour
 
         bool strictlyWallSliding = movementModifiers != null && movementModifiers.IsWallSliding && !movementModifiers.IsWallRunning;
 
-        // FIXED: Removed "!isRolling" check here. This allows background inputs to continue
-        // tracking so you don't lose all your internal momentum when exiting the roll.
         if (!strictlyWallSliding && !isWallJumpingMomentumActive)
         {
             if (Keyboard.current[OptionsManager.MoveLeft].isPressed) targetX = -1f;
@@ -182,7 +189,6 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
-            // FIXED: Added "!isRolling" here so you don't accidentally trigger a skid animation while rolling.
             if (!isRolling && isGrounded && horizontalVelocity.magnitude > 8f && targetZ != 0f && !isSkiddingTurnaround)
             {
                 if (camController != null && camController.IsThirdPerson)
@@ -291,8 +297,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // --- MOMENTUM PRESERVATION MECHANIC ---
-        // FIXED: activeMoveSpeed now actively targets currentMaxSpeed during a roll, which gives you the intended burst of speed.
         float activeMoveSpeed = isRolling ? currentMaxSpeed : Mathf.Max(moveSpeed, currentHorizontalVelocity.magnitude);
         Vector3 desiredHorizontalVelocity = direction * activeMoveSpeed;
 
@@ -313,7 +317,6 @@ public class PlayerController : MonoBehaviour
 
         if (currentMaxSpeed > originalMaxRunSpeed && isMovingInputActive && !isRolling)
         {
-            // FIXED: Clamped preservedSpeed down to currentMaxSpeed. This forces the momentum to actually deplete alongside your decay coroutine.
             float preservedSpeed = Mathf.Min(Mathf.Max(currentHorizontalVelocity.magnitude, moveSpeed), currentMaxSpeed);
             Vector3 blendedDirection = Vector3.RotateTowards(currentHorizontalVelocity.normalized, direction, blendRate * Time.fixedDeltaTime, 0f);
             finalHorizontalVelocity = blendedDirection * preservedSpeed;
@@ -339,6 +342,15 @@ public class PlayerController : MonoBehaviour
         }
 
         rb.linearVelocity = new Vector3(finalHorizontalVelocity.x, rb.linearVelocity.y, finalHorizontalVelocity.z);
+    }
+
+    private void PlayRandomJumpSound()
+    {
+        if (randomJumpEvents != null && randomJumpEvents.Length > 0)
+        {
+            int randomIndex = Random.Range(0, randomJumpEvents.Length);
+            randomJumpEvents[randomIndex]?.Invoke();
+        }
     }
 
     public void InjectWallJumpInput(Vector3 jumpDirection, bool hadForwardMomentum)
@@ -427,6 +439,8 @@ public class PlayerController : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+
+        onDeath?.Invoke(); // Fire the death event instantly when dying
 
         Vector3 deathVelocity = rb != null ? rb.linearVelocity : Vector3.zero;
 
