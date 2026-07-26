@@ -21,6 +21,7 @@ public class PlayerSpeedTracker : MonoBehaviour
     public bool isTrackingActive = false;
 
     private float countdown;
+    private bool hasExploded = false;
 
     void Start()
     {
@@ -32,6 +33,18 @@ public class PlayerSpeedTracker : MonoBehaviour
 
     void Update()
     {
+        if (hasExploded) return;
+
+        // If the player is already dead from another source, stop tracking entirely
+        if (playerController != null && playerController.currentHealth <= 0)
+        {
+            if (gameplayUIManager != null)
+            {
+                gameplayUIManager.UpdateWarningUI(false, 0f);
+            }
+            return;
+        }
+
         Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
         currentSpeed = horizontalVelocity.magnitude;
 
@@ -73,8 +86,10 @@ public class PlayerSpeedTracker : MonoBehaviour
     // Called by the trigger script
     public void SetSpeedTrackingActive(bool active)
     {
+        if (hasExploded || (playerController != null && playerController.currentHealth <= 0)) return;
+
         isTrackingActive = active;
-        countdown = explodeTimer; // Reset the timer so it starts fresh from the trigger line
+        countdown = explodeTimer;
 
         if (!active && gameplayUIManager != null)
         {
@@ -84,6 +99,16 @@ public class PlayerSpeedTracker : MonoBehaviour
 
     private void Explode()
     {
+        if (hasExploded || (playerController != null && playerController.currentHealth <= 0)) return;
+        hasExploded = true;
+        isTrackingActive = false;
+
+        // Hide the warning UI immediately on death
+        if (gameplayUIManager != null)
+        {
+            gameplayUIManager.UpdateWarningUI(false, 0f);
+        }
+
         if (explosionEffectPrefab != null)
         {
             Instantiate(explosionEffectPrefab, transform.position, transform.rotation);
