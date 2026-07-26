@@ -27,6 +27,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Levels/Pixel.unity
     guid: e39a9e2f6cbabe745bb68cf212f15557
   - enabled: 1
+    path: Assets/Scenes/Levels/Playground.unity
+    guid: 1151c2339d2dffa4aafacdae633f8a5d
+  - enabled: 1
     path: Assets/Scenes/Levels/Toon.unity
     guid: dcfc99a7952517243b17567b3040de29
   - enabled: 1
