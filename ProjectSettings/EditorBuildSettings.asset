@@ -1,3 +1,36 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7cf99ae77a13e9505810a9813ca7f885cbeaa4a9b0bf3cfcaf3bdb99027b8cda
-size 1221
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/TestSceneE.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Menus/MainMenuExample.unity
+    guid: e0f29c9b43cf4a74ba1c23d115fcb894
+  - enabled: 1
+    path: Assets/Scenes/TestSceneC.unity
+    guid: d7a040de9f3605c4b960622f6b48fd3f
+  - enabled: 1
+    path: Assets/Scenes/TestLevel.unity
+    guid: 901a7e3663993294cb4af2e2c065f975
+  - enabled: 1
+    path: Assets/Scenes/Levels/Pirate.unity
+    guid: 5d1ba72a20acb714c9b652f9713dd708
+  - enabled: 1
+    path: Assets/Scenes/Levels/NIght.unity
+    guid: a273b6c64fe5af6418dad992617d1f5b
+  - enabled: 1
+    path: Assets/Scenes/Levels/Pixel.unity
+    guid: e39a9e2f6cbabe745bb68cf212f15557
+  - enabled: 1
+    path: Assets/Scenes/Levels/Toon.unity
+    guid: dcfc99a7952517243b17567b3040de29
+  - enabled: 1
+    path: Assets/Scenes/Levels/Tutorial.unity
+    guid: f6b781e89670685448801cbf6b682657
+  m_configObjects:
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

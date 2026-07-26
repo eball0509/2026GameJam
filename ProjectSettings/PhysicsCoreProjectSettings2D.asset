@@ -1,3 +1,6 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:9a18e56e458ef07e10c1507a99ae3087e964cd6498358ca9fd1a5bac5b348392
-size 250
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!176606843 &1
+PhysicsCoreProjectSettings2D:
+  m_ObjectHideFlags: 0
+  m_PhysicsCoreSettings: {fileID: 0}

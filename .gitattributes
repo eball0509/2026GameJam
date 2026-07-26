@@ -1,1 +1,1 @@
-*.asset filter=lfs diff=lfs merge=lfs -text
+Assets/ImportedAssets/FlipGameDev/Terrain&GrassPack/Terrain_Settings/Data/Demo.asset filter=lfs diff=lfs merge=lfs -text

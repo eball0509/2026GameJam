@@ -1,3 +1,7 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:d0d2984eb8b77be4525794a674237b1d8f1f1cb9db35b1a744413c809c5593de
-size 250
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!655991488 &1
+MultiplayerManager:
+  m_ObjectHideFlags: 0
+  m_EnableMultiplayerRoles: 0
+  m_StrippingTypes: {}

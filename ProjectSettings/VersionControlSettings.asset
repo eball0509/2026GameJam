@@ -1,3 +1,7 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:3552bdd8445b38b34d222c1f8d3bc4649dd9ab0ec2ea4c9bc21f7b3371c9fee6
-size 250
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!890905787 &1
+VersionControlSettings:
+  m_ObjectHideFlags: 0
+  m_Mode: Visible Meta Files
+  m_TrackPackagesOutsideProject: 0
