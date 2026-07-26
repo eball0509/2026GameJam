@@ -2260,8 +2260,14 @@ MonoBehaviour:
   silverTimeTarget: 30
   bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
-  uniqueCollectibleSprites: []
-  performanceMedals: []
+  uniqueCollectibleSprites:
+  - {fileID: 21300000, guid: 930be76834968fe4e8a564f5a1dbfd70, type: 3}
+  - {fileID: 21300000, guid: cd8721c888907f14795a8a20de566fda, type: 3}
+  - {fileID: 21300000, guid: 37d826586c839ec4981fe17a4dc728a9, type: 3}
+  performanceMedals:
+  - {fileID: 21300000, guid: cb1f6b75b8d9e284e80e3f53b8fb58ba, type: 3}
+  - {fileID: 21300000, guid: 3306830daad3fdd46b525028956a4208, type: 3}
+  - {fileID: 21300000, guid: 6aff9917cc50a8049a9bdf6a3cfed8f6, type: 3}
   panelAnchor: {fileID: 189103878}
   hoverScaleFactor: 1.15
   scalingSpeed: 12
@@ -5029,8 +5035,14 @@ MonoBehaviour:
   silverTimeTarget: 30
   bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
-  uniqueCollectibleSprites: []
-  performanceMedals: []
+  uniqueCollectibleSprites:
+  - {fileID: -1049940978, guid: cd0b8890fd943ec42b39ec4e5fa041c1, type: 3}
+  - {fileID: -944697150, guid: cd0b8890fd943ec42b39ec4e5fa041c1, type: 3}
+  - {fileID: 1979398198, guid: cd0b8890fd943ec42b39ec4e5fa041c1, type: 3}
+  performanceMedals:
+  - {fileID: 21300000, guid: 3050096df1af83843971e1c7e3d6760d, type: 3}
+  - {fileID: 21300000, guid: b0a3bea357001024891b10458b15b79c, type: 3}
+  - {fileID: 21300000, guid: 2984b2761cf732b42ad2f83bae42f7a6, type: 3}
   panelAnchor: {fileID: 194700539}
   hoverScaleFactor: 1.15
   scalingSpeed: 12
@@ -14014,11 +14026,14 @@ MonoBehaviour:
   silverTimeTarget: 30
   bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
-  uniqueCollectibleSprites: []
+  uniqueCollectibleSprites:
+  - {fileID: 21300000, guid: 1d94a5eed7f6b6e4097b1a55890399c2, type: 3}
+  - {fileID: 21300000, guid: 81b564a97aa19c24f844a59c1791779a, type: 3}
+  - {fileID: 21300000, guid: 80c8b357c091502438532c99094dda3b, type: 3}
   performanceMedals:
-  - {fileID: 21300000, guid: b01e85c96186e6e4996cf33ea8205c5f, type: 3}
-  - {fileID: 21300000, guid: 956a54fd70086eb4ea7d4c8a1e301463, type: 3}
-  - {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 21300000, guid: 61938e1dd9563c747835946a5152934f, type: 3}
+  - {fileID: 21300000, guid: e52db526ff2563a48896818f4cc48c02, type: 3}
+  - {fileID: 21300000, guid: 4c4c1be22024ef046b5552571ad481cd, type: 3}
   panelAnchor: {fileID: 1631581729}
   hoverScaleFactor: 1.15
   scalingSpeed: 12
@@ -15032,8 +15047,14 @@ MonoBehaviour:
   silverTimeTarget: 30
   bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
-  uniqueCollectibleSprites: []
-  performanceMedals: []
+  uniqueCollectibleSprites:
+  - {fileID: 21300000, guid: 201c6636d903c444ebb6888374f9662d, type: 3}
+  - {fileID: 21300000, guid: a17c91eec928f1b418ef11fb77b3631c, type: 3}
+  - {fileID: 21300000, guid: ac3df7c1031207247a375a12da62b806, type: 3}
+  performanceMedals:
+  - {fileID: 21300000, guid: 3c105e4a889a6c64ca118e28f51c9be6, type: 3}
+  - {fileID: 21300000, guid: 586612bac5102ca4aad6195fc3e562a8, type: 3}
+  - {fileID: 21300000, guid: 3d2aafa8d45e0e44191ea6b632c7c3d0, type: 3}
   panelAnchor: {fileID: 490769410}
   hoverScaleFactor: 1.15
   scalingSpeed: 12
