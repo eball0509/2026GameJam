@@ -2252,10 +2252,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 990c1b283f424bf499f7cac47c413509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelMapNode
-  levelName: 5
+  levelName: Pirate
   levelSummary: A short jump through the block valley.
   totalCollectiblesCount: 3
-  sceneTargetName: Scene_Tutorial
+  sceneTargetName: Pirate
   goldTimeTarget: 15
   silverTimeTarget: 30
   bronzeTimeTarget: 45
@@ -5027,10 +5027,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 990c1b283f424bf499f7cac47c413509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelMapNode
-  levelName: 3
+  levelName: Pixel
   levelSummary: A short jump through the block valley.
   totalCollectiblesCount: 3
-  sceneTargetName: Scene_Tutorial
+  sceneTargetName: Pixel
   goldTimeTarget: 15
   silverTimeTarget: 30
   bronzeTimeTarget: 45
@@ -8593,10 +8593,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 990c1b283f424bf499f7cac47c413509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelMapNode
-  levelName: 4
+  levelName: Night
   levelSummary: A short jump through the block valley.
   totalCollectiblesCount: 3
-  sceneTargetName: Scene_Tutorial
+  sceneTargetName: Night
   goldTimeTarget: 15
   silverTimeTarget: 30
   bronzeTimeTarget: 45
@@ -15039,10 +15039,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 990c1b283f424bf499f7cac47c413509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelMapNode
-  levelName: 2
+  levelName: Toon
   levelSummary: A short jump through the block valley.
   totalCollectiblesCount: 3
-  sceneTargetName: Level2
+  sceneTargetName: Toon
   goldTimeTarget: 15
   silverTimeTarget: 30
   bronzeTimeTarget: 45
