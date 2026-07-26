@@ -25,12 +25,6 @@ public class LevelManager : MonoBehaviour
     {
         collectedCount = 0;
         isLevelFinished = false;
-
-        GameplayUIManager uiManager = FindAnyObjectByType<GameplayUIManager>();
-        if (uiManager != null)
-        {
-            uiManager.SetTimerActive(true);
-        }
     }
 
     public void IncrementCollectibleCount()
