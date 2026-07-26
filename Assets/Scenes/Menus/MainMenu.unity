@@ -7021,7 +7021,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelMapNode
   levelName: Retro Arcade Snack-Attack
-  levelSummary: We apologize, we didn't have enough time to make more levels :(
+  levelSummary: 'We apologize, we didn''t have enough time to make more levels :(
+
+    This
+    is a little playgroud where you can just run around and mess with the physics'
   totalCollectiblesCount: 3
   sceneTargetName: Playground
   goldTimeTarget: 15
