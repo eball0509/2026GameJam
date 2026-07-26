@@ -17786,7 +17786,7 @@ MonoBehaviour:
   titleRotation: {x: 34.999996, y: 20.3, z: 0.00000052113256}
   mapPosition: {x: 0.64, y: 8.31, z: 1.44}
   mapRotation: {x: 90, y: 0, z: 0}
-  optionsPosition: {x: -6.227326, y: 15.19861, z: -24.81166}
+  optionsPosition: {x: -6.227326, y: 15.19861, z: -18.81166}
   optionsRotation: {x: 3.541, y: 170.14, z: -0.007}
   zoomSpeed: 5
   localNodeZoomHeight: 4
