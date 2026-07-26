@@ -24,6 +24,10 @@ public class LevelMapNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [Tooltip("Ensure array layout is: Element 0 = Bronze, Element 1 = Silver, Element 2 = Gold")]
     [SerializeField] private Sprite[] performanceMedals;
 
+    [Header("Node Icon Medal Badge")]
+    [Tooltip("Drag the child Image object here that will show the medal on the map node.")]
+    [SerializeField] private Image nodeMedalImage; // Added Reference for the Node Medal Display
+
     [Header("Placement Positioning")]
     [SerializeField] private Transform panelAnchor;
 
@@ -72,11 +76,52 @@ public class LevelMapNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         {
             if (nodeImage != null) nodeImage.enabled = false;
             if (buttonComponent != null) buttonComponent.interactable = false;
+            if (nodeMedalImage != null) nodeMedalImage.gameObject.SetActive(false); // Hide medal if locked
         }
         else
         {
             if (nodeImage != null) nodeImage.enabled = true;
             if (buttonComponent != null) buttonComponent.interactable = true;
+
+            // Show medal on the node if the level is unlocked and beaten
+            DisplayEarnedMedalOnNode();
+        }
+    }
+
+    private void DisplayEarnedMedalOnNode()
+    {
+        if (nodeMedalImage == null) return;
+
+        float bestTime = PlayerPrefs.GetFloat(levelName + "_BestTime", 0.0f);
+        Sprite earnedMedalSprite = null;
+
+        // Calculate which medal was earned based on bestTime records
+        if (bestTime > 0f && performanceMedals != null && performanceMedals.Length >= 3)
+        {
+            if (bestTime <= goldTimeTarget)
+            {
+                earnedMedalSprite = performanceMedals[2]; // Gold (Index 2)
+            }
+            else if (bestTime <= silverTimeTarget)
+            {
+                earnedMedalSprite = performanceMedals[1]; // Silver (Index 1)
+            }
+            else if (bestTime <= bronzeTimeTarget)
+            {
+                earnedMedalSprite = performanceMedals[0]; // Bronze (Index 0)
+            }
+        }
+
+        // Apply visual adjustments to the badge slot
+        if (earnedMedalSprite != null)
+        {
+            nodeMedalImage.gameObject.SetActive(true);
+            nodeMedalImage.sprite = earnedMedalSprite;
+        }
+        else
+        {
+            // Turn it off if the user unlocked the level but hasn't beaten it yet
+            nodeMedalImage.gameObject.SetActive(false);
         }
     }
 
@@ -115,22 +160,12 @@ public class LevelMapNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         int gemsFound = PlayerPrefs.GetInt(levelName + "_Collectibles", 0);
         float bestTime = PlayerPrefs.GetFloat(levelName + "_BestTime", 0.0f);
 
-        // FIX: Dynamically calculate the visual medal status from historical best time records
         Sprite earnedMedalSprite = null;
         if (bestTime > 0f && performanceMedals != null && performanceMedals.Length >= 3)
         {
-            if (bestTime <= goldTimeTarget)
-            {
-                earnedMedalSprite = performanceMedals[2]; // Gold (Index 2)
-            }
-            else if (bestTime <= silverTimeTarget)
-            {
-                earnedMedalSprite = performanceMedals[1]; // Silver (Index 1)
-            }
-            else if (bestTime <= bronzeTimeTarget)
-            {
-                earnedMedalSprite = performanceMedals[0]; // Bronze (Index 0)
-            }
+            if (bestTime <= goldTimeTarget) earnedMedalSprite = performanceMedals[2];
+            else if (bestTime <= silverTimeTarget) earnedMedalSprite = performanceMedals[1];
+            else if (bestTime <= bronzeTimeTarget) earnedMedalSprite = performanceMedals[0];
         }
 
         Vector3 targetPanelPos = panelAnchor != null ? panelAnchor.position : transform.position;
@@ -173,8 +208,9 @@ public class LevelMapNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     {
         PlayerPrefs.SetInt("Unlocked_" + levelName, 1);
         PlayerPrefs.SetInt(levelName + "_Collectibles", totalCollectiblesCount);
-        PlayerPrefs.SetFloat(levelName + "_BestTime", goldTimeTarget - 1f); // Forces Gold Time threshold range
+        PlayerPrefs.SetFloat(levelName + "_BestTime", goldTimeTarget - 1f);
         PlayerPrefs.Save();
+        CheckUnlockProgression(); // Updated to dynamically refresh layout instantly upon execution
         Debug.Log("<color=green>DevCheat:</color> Injected Max Stats Data Profile!");
     }
 

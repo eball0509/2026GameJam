@@ -16,7 +16,7 @@ public class LevelManager : MonoBehaviour
     public float bronzeTimeTarget = 45f;
 
     [Header("MainMenu System Mapping")]
-    [SerializeField] private string mainMenuSceneName = "MainMenuExample";
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private int collectedCount = 0;
     private bool isLevelFinished = false;
