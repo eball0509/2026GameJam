@@ -27,7 +27,6 @@ public class MainMenuManager : MonoBehaviour
         if (levelSelectCanvasUI != null) levelSelectCanvasUI.SetActive(false);
     }
 
-    // FIX: Allows the LevelSelectManager to shut off the title screen on return
     public void DisableTitlePanel()
     {
         if (titleMenuPanel != null) titleMenuPanel.SetActive(false);
@@ -91,6 +90,20 @@ public class MainMenuManager : MonoBehaviour
     public void OnOptionsClicked()
     {
         if (titleMenuPanel != null) titleMenuPanel.SetActive(false);
+
+        if (levelSelectManager != null)
+        {
+            // Camera takes over and drives to the options view pane position
+            levelSelectManager.StartOptionsZoomTransition();
+        }
+        else
+        {
+            EnableOptionsUI();
+        }
+    }
+
+    public void EnableOptionsUI() // Split into separate method for the camera callback hook
+    {
         if (optionsMenuPanel != null)
         {
             optionsMenuPanel.SetActive(true);
@@ -101,10 +114,15 @@ public class MainMenuManager : MonoBehaviour
     public void OnBackFromOptionsClicked()
     {
         if (optionsMenuPanel != null) optionsMenuPanel.SetActive(false);
-        if (titleMenuPanel != null)
+
+        if (levelSelectManager != null)
         {
-            titleMenuPanel.SetActive(true);
-            TriggerFadeIn(titleMenuPanel);
+            // Zooms camera smoothly back to title setup position
+            levelSelectManager.StartMenuZoomOutTransition();
+        }
+        else
+        {
+            EnableTitleMenuUI();
         }
     }
 

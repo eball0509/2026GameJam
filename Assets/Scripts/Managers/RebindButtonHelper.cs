@@ -56,6 +56,7 @@ public class RebindButtonHelper : MonoBehaviour
             case "Backward": return "S";
             case "Right": return "D";
             case "Jump": return "Space";
+            case "Roll": return "LeftCtrl";
             case "LookBehind": return "C";
             case "Perspective": return "V";
             default: return "None";

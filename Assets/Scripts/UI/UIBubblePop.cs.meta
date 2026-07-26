@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 1f5d251bc71b32942806e5e9302465a1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - popParticlePrefab: {fileID: 2277594021589752350, guid: 9b4fb0561ed0cec4fad094c06e9d409d, type: 3}
+  - uiGraphicToHide: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

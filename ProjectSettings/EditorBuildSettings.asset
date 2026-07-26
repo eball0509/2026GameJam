@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TestSceneE.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Menus/MainMenuExample.unity
     guid: e0f29c9b43cf4a74ba1c23d115fcb894
   - enabled: 1
@@ -32,5 +32,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/Tutorial.unity
     guid: f6b781e89670685448801cbf6b682657
+  - enabled: 1
+    path: Assets/Scenes/Menus/MainMenu.unity
+    guid: 95ba04484a6e5ff4cb08a84e52528ba0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

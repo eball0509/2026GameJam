@@ -103,6 +103,7 @@ public class OptionsManager : MonoBehaviour
             case "Backward": MoveBackward = newBoundKey; break;
             case "Right": MoveRight = newBoundKey; break;
             case "Jump": Jump = newBoundKey; break;
+            case "Roll": Roll = newBoundKey; break;
             case "LookBehind": LookBehind = newBoundKey; break;
             case "Perspective": TogglePerspective = newBoundKey; break;
         }
@@ -123,6 +124,7 @@ public class OptionsManager : MonoBehaviour
         if (MoveBackward == targetKey && clearExceptionActionId != "Backward") { MoveBackward = Key.None; SaveUnboundAction("Backward"); }
         if (MoveRight == targetKey && clearExceptionActionId != "Right") { MoveRight = Key.None; SaveUnboundAction("Right"); }
         if (Jump == targetKey && clearExceptionActionId != "Jump") { Jump = Key.None; SaveUnboundAction("Jump"); }
+        if (Roll == targetKey && clearExceptionActionId != "Roll") { Roll = Key.None; SaveUnboundAction("Roll"); }
         if (LookBehind == targetKey && clearExceptionActionId != "LookBehind") { LookBehind = Key.None; SaveUnboundAction("LookBehind"); }
         if (TogglePerspective == targetKey && clearExceptionActionId != "Perspective") { TogglePerspective = Key.None; SaveUnboundAction("Perspective"); }
     }
@@ -146,7 +148,16 @@ public class OptionsManager : MonoBehaviour
 
     private Key ConvertKeyCodeToInputSystemKey(KeyCode legacyCode)
     {
+        // Fix legacy names to match the modern Input System names
         string enumNormalizedName = legacyCode.ToString();
+
+        if (legacyCode == KeyCode.LeftControl) enumNormalizedName = "LeftCtrl";
+        if (legacyCode == KeyCode.RightControl) enumNormalizedName = "RightCtrl";
+        if (legacyCode == KeyCode.LeftShift) enumNormalizedName = "LeftShift";
+        if (legacyCode == KeyCode.RightShift) enumNormalizedName = "RightShift";
+        if (legacyCode == KeyCode.LeftAlt) enumNormalizedName = "LeftAlt";
+        if (legacyCode == KeyCode.RightAlt) enumNormalizedName = "RightAlt";
+
         if (System.Enum.TryParse(enumNormalizedName, true, out Key nativeKey))
         {
             return nativeKey;
@@ -258,6 +269,7 @@ public class OptionsManager : MonoBehaviour
         MoveBackward = LoadKeybindFromStorage("Backward", Key.S);
         MoveRight = LoadKeybindFromStorage("Right", Key.D);
         Jump = LoadKeybindFromStorage("Jump", Key.Space);
+        Roll = LoadKeybindFromStorage("Roll", Key.LeftCtrl);
         LookBehind = LoadKeybindFromStorage("LookBehind", Key.C);
         TogglePerspective = LoadKeybindFromStorage("Perspective", Key.V);
     }

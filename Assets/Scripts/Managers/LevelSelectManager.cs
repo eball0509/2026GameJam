@@ -3,13 +3,15 @@ using UnityEngine;
 
 public class LevelSelectManager : MonoBehaviour
 {
-    private enum CameraState { AtTitle, ZoomingToMap, AtMap, ZoomingToTitle, ZoomedInOnLevel }
+    private enum CameraState { AtTitle, ZoomingToMap, AtMap, ZoomingToTitle, ZoomedInOnLevel, ZoomingToOptions, AtOptions }
 
     [Header("Camera Positions")]
     [SerializeField] private Vector3 titlePosition;
     [SerializeField] private Vector3 titleRotation;
     [SerializeField] private Vector3 mapPosition;
     [SerializeField] private Vector3 mapRotation;
+    [SerializeField] private Vector3 optionsPosition; // Added Options Position
+    [SerializeField] private Vector3 optionsRotation; // Added Options Rotation
 
     [Header("Zoom settings")]
     [SerializeField] private float zoomSpeed = 4f;
@@ -32,23 +34,19 @@ public class LevelSelectManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(lastPlayedLevel))
         {
-            // Clear the key immediately
             PlayerPrefs.SetString("LastPlayedLevel", "");
             PlayerPrefs.Save();
 
-            // Snap camera directly to the map position
             transform.position = mapPosition;
             transform.rotation = Quaternion.Euler(mapRotation);
             currentState = CameraState.AtMap;
 
-            // Force Title screen OFF and Level Select canvas ON immediately
             if (mainMenuManager != null)
             {
                 mainMenuManager.DisableTitlePanel();
                 mainMenuManager.EnableLevelSelectUI(false);
             }
 
-            // Start the initialization delay loop to let UI systems wake up
             StartCoroutine(ReturnToNodeRoutine(lastPlayedLevel));
         }
         else
@@ -61,20 +59,16 @@ public class LevelSelectManager : MonoBehaviour
 
     private IEnumerator ReturnToNodeRoutine(string lastPlayedLevelName)
     {
-        // Wait two full frames to ensure the Canvas UI Hierarchy is fully turned on,
-        // UI graphics elements have processed layout bounds, and Awake/Start loops have run.
         yield return null;
         yield return null;
 
         LevelMapNode[] allNodes = FindObjectsByType<LevelMapNode>();
 
-        // 1. Explicitly force all nodes to read their updated PlayerPrefs
         foreach (LevelMapNode node in allNodes)
         {
             node.RefreshUnlockState();
         }
 
-        // 2. Find the active node matching the target name and call selection panel logic
         foreach (LevelMapNode node in allNodes)
         {
             if (node.levelName.Equals(lastPlayedLevelName, System.StringComparison.OrdinalIgnoreCase))
@@ -105,6 +99,10 @@ public class LevelSelectManager : MonoBehaviour
         {
             ExecuteCamLerp(specificTargetPosition, mapRotation, CameraState.ZoomedInOnLevel, null);
         }
+        else if (currentState == CameraState.ZoomingToOptions) // Added Options Zoom Update
+        {
+            ExecuteCamLerp(optionsPosition, optionsRotation, CameraState.AtOptions, () => mainMenuManager?.EnableOptionsUI());
+        }
     }
 
     private void ExecuteCamLerp(Vector3 targetPos, Vector3 targetRot, CameraState endState, System.Action callback)
@@ -129,6 +127,11 @@ public class LevelSelectManager : MonoBehaviour
     }
 
     public void StartMenuZoomOutTransition() => currentState = CameraState.ZoomingToTitle;
+
+    public void StartOptionsZoomTransition() // Added Call to zoom into Options
+    {
+        currentState = CameraState.ZoomingToOptions;
+    }
 
     public void ZoomIntoLevelNode(Vector3 targetWorldPosition)
     {
