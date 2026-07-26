@@ -61,7 +61,7 @@ public class LevelMapNode : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     private void CheckUnlockProgression()
     {
-        if (levelName == "Tutorial")
+        if (levelName == "The Boring Green Starting Place")
         {
             PlayerPrefs.SetInt("Unlocked_" + levelName, 1);
         }
