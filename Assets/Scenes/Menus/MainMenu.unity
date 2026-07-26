@@ -3258,6 +3258,55 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIHoverTilt
   maxTiltAngle: 15
   smoothSpeed: 10
+--- !u!1 &296057734
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 296057736}
+  - component: {fileID: 296057735}
+  m_Layer: 0
+  m_Name: Global Volume (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &296057735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296057734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 9fbc506b8b112a2468ee4b40c763fef4, type: 2}
+--- !u!4 &296057736
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296057734}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -7.445974, y: 7.610569, z: -3.8628643}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &305738880
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6978,7 +7027,7 @@ MonoBehaviour:
     blocky fruit that rolls down the lanes. There are even little colorful ghost-like
     shapes floating in the background, cheering you on to keep your speed up.
   totalCollectiblesCount: 3
-  sceneTargetName: Pixel
+  sceneTargetName: Playground
   goldTimeTarget: 15
   silverTimeTarget: 30
   bronzeTimeTarget: 45
@@ -22175,7 +22224,7 @@ MonoBehaviour:
   goldTimeTarget: 15
   silverTimeTarget: 30
   bronzeTimeTarget: 45
-  fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
+  fullLevelImage: {fileID: 21300000, guid: 2f3ca62c1202b0c4db6d95f5a3dc8ca7, type: 3}
   uniqueCollectibleSprites:
   - {fileID: 21300000, guid: 201c6636d903c444ebb6888374f9662d, type: 3}
   - {fileID: 21300000, guid: a17c91eec928f1b418ef11fb77b3631c, type: 3}
@@ -22526,4 +22575,5 @@ SceneRoots:
   - {fileID: 480903357}
   - {fileID: 1588978914}
   - {fileID: 970233525}
+  - {fileID: 296057736}
   - {fileID: 1017045077}

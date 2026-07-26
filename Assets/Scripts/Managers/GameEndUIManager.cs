@@ -10,7 +10,6 @@ public class GameEndUIManager : MonoBehaviour
     [SerializeField] private CanvasGroup winPanel;
     [SerializeField] private float fadeDuration = 1.5f;
 
-    // --- ADD THIS TO HOOK UP AND CLEAR GAMEPLAY HUD ---
     [Header("Gameplay HUD Settings")]
     [Tooltip("Drop your main gameplay HUD GameObject here to hide it during transitions.")]
     [SerializeField] private GameObject normalGameplayHUD;
@@ -58,7 +57,9 @@ public class GameEndUIManager : MonoBehaviour
 
     public void TriggerDeathState()
     {
-        // Optional: you can turn off the HUD here too if you'd like
+        // Turn off the trippy script instantly so death menus are clickable
+        DisableTrippyWarpSystem();
+
         if (normalGameplayHUD != null) normalGameplayHUD.SetActive(false);
 
         StartCoroutine(FadeInPanelRoutine(deathPanel));
@@ -67,15 +68,14 @@ public class GameEndUIManager : MonoBehaviour
 
     public void TriggerWinState()
     {
-        // 1. Instantly hide standard level UIs (Timer, crosshairs, collectibles counters)
+        // Turn off the trippy script instantly so victory/options menus are clickable
+        DisableTrippyWarpSystem();
+
         if (normalGameplayHUD != null) normalGameplayHUD.SetActive(false);
 
         if (player != null)
         {
-            // 2. CRITICAL: Make player immune to the imminent explosion damage or hazard triggers
             player.SetInvincible(true);
-
-            // 3. Disable standard input actions
             player.enabled = false;
 
             PlayerCameraController camControl = player.GetComponentInChildren<PlayerCameraController>();
@@ -84,13 +84,22 @@ public class GameEndUIManager : MonoBehaviour
             Rigidbody rb = player.GetComponent<Rigidbody>();
             if (rb != null) rb.linearVelocity = Vector3.zero;
 
-            // 4. Hit the dance move
             player.TriggerVictoryDance();
         }
 
         isOrbiting = true;
         StartCoroutine(FadeInPanelRoutine(winPanel));
         UnlockMouse();
+    }
+
+    // --- NEW HELPER METHOD TO FIND AND DISABLE THE TRIPPY CONTROLLER ---
+    private void DisableTrippyWarpSystem()
+    {
+        TrippyEffectController trippyController = FindAnyObjectByType<TrippyEffectController>();
+        if (trippyController != null)
+        {
+            trippyController.enabled = false;
+        }
     }
 
     private void SetupPanelInitialState(CanvasGroup panel)

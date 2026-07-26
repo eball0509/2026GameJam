@@ -57,6 +57,9 @@ public class InGamePauseManager : MonoBehaviour
         if (isPaused) return;
         isPaused = true;
 
+        // --- TURN OFF THE TRIPPY EFFECT SO MENU CLICKS WORK PERFECTLY ---
+        SetTrippyWarpSystemState(false);
+
         if (playerCamController != null) playerCamController.enabled = false;
         Time.timeScale = 0f;
 
@@ -75,6 +78,9 @@ public class InGamePauseManager : MonoBehaviour
         if (!isPaused) return;
         isPaused = false;
 
+        // --- TURN THE TRIPPY EFFECT BACK ON FOR GAMEPLAY ---
+        SetTrippyWarpSystemState(true);
+
         if (pauseMenuParentPanel != null) pauseMenuParentPanel.SetActive(false);
         Time.timeScale = 1f;
 
@@ -85,6 +91,16 @@ public class InGamePauseManager : MonoBehaviour
         if (playerCamController != null) playerCamController.enabled = true;
     }
 
+    // --- HELPER METHOD TO TOGGLE THE TRIPPY SCRIPT ON OR OFF ---
+    private void SetTrippyWarpSystemState(bool state)
+    {
+        TrippyEffectController trippyController = FindAnyObjectByType<TrippyEffectController>();
+        if (trippyController != null)
+        {
+            trippyController.enabled = state;
+        }
+    }
+
     private IEnumerator TransitionCameraToAnchor()
     {
         Vector3 targetWorldPos = menuCameraAnchor.position;
@@ -92,11 +108,9 @@ public class InGamePauseManager : MonoBehaviour
 
         while (isPaused && menuCameraAnchor != null && mainCameraTransform != null)
         {
-            // Lerp the position and rotation cleanly
             mainCameraTransform.position = Vector3.Lerp(mainCameraTransform.position, targetWorldPos, cameraPanSpeed * Time.unscaledDeltaTime);
             mainCameraTransform.rotation = Quaternion.Slerp(mainCameraTransform.rotation, targetWorldRot, cameraPanSpeed * Time.unscaledDeltaTime);
 
-            // FORCE the Field of View to transition cleanly to the menu settings as well!
             if (targetCameraComponent != null)
             {
                 targetCameraComponent.fieldOfView = Mathf.Lerp(targetCameraComponent.fieldOfView, menuFOV, cameraPanSpeed * Time.unscaledDeltaTime);
