@@ -425,7 +425,7 @@ MonoBehaviour:
   wallCheckDistance: 0.8
   wallMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 0
   speedToClimbMultiplier: 0.8
   wallBounceUpForce: 10
   wallBounceAwayForce: 10
@@ -433,7 +433,7 @@ MonoBehaviour:
   tangentBias: 0.75
   wallRunAngleThreshold: 30
   wallStickForce: 25
-  wallRunGravityMultiplier: 0.6
+  wallRunGravityMultiplier: 0.5
 --- !u!1001 &4965738635612174257
 PrefabInstance:
   m_ObjectHideFlags: 0

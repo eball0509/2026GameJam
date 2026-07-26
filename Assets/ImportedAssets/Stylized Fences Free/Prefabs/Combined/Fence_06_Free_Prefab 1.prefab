@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6243230742205684792}
   - component: {fileID: 5574467748089932914}
   m_Layer: 0
-  m_Name: Fence_06_Free_Prefab
+  m_Name: Fence_06_Free_Prefab 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
