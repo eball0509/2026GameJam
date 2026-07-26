@@ -101,9 +101,6 @@ public class GameplayUIManager : MonoBehaviour
         if (timerText != null)
         {
             timerText.text = string.Format("{0:00}:{1:00}.{2:00}", minutes, seconds, milliseconds);
-
-            // Check your console: If you see this spamming every frame with changing numbers, 
-            // the code is 100% working, and the problem is purely visual in the Unity UI.
         }
     }
 

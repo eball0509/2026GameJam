@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(CapsuleCollider))]
 public class PlayerController : MonoBehaviour
@@ -47,6 +48,11 @@ public class PlayerController : MonoBehaviour
     private Collider[] ragdollColliders;
     private bool isDead = false;
 
+    [Header("Audio & Events")]
+    public UnityEvent onRoll;
+    public UnityEvent[] randomJumpEvents;
+    public UnityEvent onDeath; // Added death event
+
     public bool IsGrounded => isGrounded;
     public bool IsRolling => isRolling;
 
@@ -70,7 +76,7 @@ public class PlayerController : MonoBehaviour
 
     private bool isSkiddingTurnaround = false;
     private float turnaroundTimer = 0f;
-    private const float SKID_DURATION_LOCK = 0.3f; // Slightly shortened for punchier transitions
+    private const float SKID_DURATION_LOCK = 0.3f;
 
     private bool isWallJumpingMomentumActive = false;
     private bool wallJumpHadForwardMomentum = false;
@@ -142,12 +148,14 @@ public class PlayerController : MonoBehaviour
                     anim.SetTrigger("JumpTrigger");
                 }
                 isSkiddingTurnaround = false;
+                PlayRandomJumpSound();
             }
             else if (isGrounded)
             {
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
                 if (anim != null) anim.SetTrigger("JumpTrigger");
                 isSkiddingTurnaround = false;
+                PlayRandomJumpSound();
             }
         }
 
@@ -155,13 +163,13 @@ public class PlayerController : MonoBehaviour
         {
             StartCoroutine(RollRoutine());
             if (anim != null) anim.SetTrigger("RollTrigger");
+            onRoll?.Invoke();
         }
 
         if (isSkiddingTurnaround)
         {
             turnaroundTimer -= Time.deltaTime;
             if (turnaroundTimer <= 0f) isSkiddingTurnaround = false;
-            // Removed internal update return to allow real-time input gathering during skids
         }
 
         float targetX = 0f;
@@ -169,7 +177,7 @@ public class PlayerController : MonoBehaviour
 
         bool strictlyWallSliding = movementModifiers != null && movementModifiers.IsWallSliding && !movementModifiers.IsWallRunning;
 
-        if (!isRolling && !strictlyWallSliding && !isWallJumpingMomentumActive)
+        if (!strictlyWallSliding && !isWallJumpingMomentumActive)
         {
             if (Keyboard.current[OptionsManager.MoveLeft].isPressed) targetX = -1f;
             if (Keyboard.current[OptionsManager.MoveRight].isPressed) targetX = 1f;
@@ -181,7 +189,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 horizontalVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
-            if (isGrounded && horizontalVelocity.magnitude > 8f && targetZ != 0f && !isSkiddingTurnaround)
+            if (!isRolling && isGrounded && horizontalVelocity.magnitude > 8f && targetZ != 0f && !isSkiddingTurnaround)
             {
                 if (camController != null && camController.IsThirdPerson)
                 {
@@ -289,9 +297,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // --- MOMENTUM PRESERVATION MECHANIC ---
-        // Calculate velocity update using blended inputs rather than stopping the player outright
-        float activeMoveSpeed = Mathf.Max(moveSpeed, currentHorizontalVelocity.magnitude);
+        float activeMoveSpeed = isRolling ? currentMaxSpeed : Mathf.Max(moveSpeed, currentHorizontalVelocity.magnitude);
         Vector3 desiredHorizontalVelocity = direction * activeMoveSpeed;
 
         bool isMovingInputActive = isRolling || isWallRunning || (currentMaxSpeed > originalMaxRunSpeed) || (
@@ -302,7 +308,6 @@ public class PlayerController : MonoBehaviour
 
         bool isBraking = !isRolling && !isWallRunning && Keyboard.current[OptionsManager.MoveBackward].isPressed && currentMoveZ > 0.05f;
 
-        // Apply dynamic turnaround brake modifications directly to the blend calculation rather than returning early
         float blendRate = isBraking ? brakeSpeed : (isMovingInputActive ? acceleration : groundFriction);
         if (isSkiddingTurnaround) blendRate = turnaroundBrakeForce;
 
@@ -312,7 +317,7 @@ public class PlayerController : MonoBehaviour
 
         if (currentMaxSpeed > originalMaxRunSpeed && isMovingInputActive && !isRolling)
         {
-            float preservedSpeed = Mathf.Max(currentHorizontalVelocity.magnitude, moveSpeed);
+            float preservedSpeed = Mathf.Min(Mathf.Max(currentHorizontalVelocity.magnitude, moveSpeed), currentMaxSpeed);
             Vector3 blendedDirection = Vector3.RotateTowards(currentHorizontalVelocity.normalized, direction, blendRate * Time.fixedDeltaTime, 0f);
             finalHorizontalVelocity = blendedDirection * preservedSpeed;
         }
@@ -339,6 +344,15 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = new Vector3(finalHorizontalVelocity.x, rb.linearVelocity.y, finalHorizontalVelocity.z);
     }
 
+    private void PlayRandomJumpSound()
+    {
+        if (randomJumpEvents != null && randomJumpEvents.Length > 0)
+        {
+            int randomIndex = Random.Range(0, randomJumpEvents.Length);
+            randomJumpEvents[randomIndex]?.Invoke();
+        }
+    }
+
     public void InjectWallJumpInput(Vector3 jumpDirection, bool hadForwardMomentum)
     {
         isSkiddingTurnaround = false;
@@ -353,8 +367,6 @@ public class PlayerController : MonoBehaviour
     {
         isSkiddingTurnaround = true;
         turnaroundTimer = SKID_DURATION_LOCK;
-        // REMOVED: currentMoveX = 0f; currentMoveZ = 0f; 
-        // Keeping inputs alive allows momentum vectors to shift smoothly into the new direction.
         if (anim != null) anim.SetTrigger("TurnAroundTrigger");
     }
 
@@ -427,6 +439,8 @@ public class PlayerController : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+
+        onDeath?.Invoke(); // Fire the death event instantly when dying
 
         Vector3 deathVelocity = rb != null ? rb.linearVelocity : Vector3.zero;
 
