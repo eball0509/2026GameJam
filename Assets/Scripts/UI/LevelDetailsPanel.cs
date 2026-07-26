@@ -79,13 +79,16 @@ public class LevelDetailsPanel : MonoBehaviour
                     UICollectibleSlots[i].sprite = levelItemSprites[i];
                 }
 
-                if (i < collectiblesFound)
+                // FIX: Check if this specific item model index key has a saved state of 1
+                bool hasBeenFound = PlayerPrefs.GetInt($"{levelName}_Collectible_{i}", 0) == 1;
+
+                if (hasBeenFound)
                 {
-                    UICollectibleSlots[i].color = Color.white;
+                    UICollectibleSlots[i].color = Color.white; // Show fully colored image
                 }
                 else
                 {
-                    UICollectibleSlots[i].color = new Color(0.1f, 0.1f, 0.1f, 0.4f);
+                    UICollectibleSlots[i].color = new Color(0.1f, 0.1f, 0.1f, 0.4f); // Keep blacked out
                 }
             }
             else

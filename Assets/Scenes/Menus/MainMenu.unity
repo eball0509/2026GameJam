@@ -9453,7 +9453,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &858462479
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21065,9 +21065,9 @@ MonoBehaviour:
   bronzeTimeTarget: 45
   fullLevelImage: {fileID: 21300000, guid: 99148e55603cae84a83fde87215529aa, type: 3}
   uniqueCollectibleSprites:
-  - {fileID: 21300000, guid: 1d94a5eed7f6b6e4097b1a55890399c2, type: 3}
-  - {fileID: 21300000, guid: 81b564a97aa19c24f844a59c1791779a, type: 3}
   - {fileID: 21300000, guid: 80c8b357c091502438532c99094dda3b, type: 3}
+  - {fileID: 21300000, guid: 81b564a97aa19c24f844a59c1791779a, type: 3}
+  - {fileID: 21300000, guid: 1d94a5eed7f6b6e4097b1a55890399c2, type: 3}
   performanceMedals:
   - {fileID: 21300000, guid: 61938e1dd9563c747835946a5152934f, type: 3}
   - {fileID: 21300000, guid: e52db526ff2563a48896818f4cc48c02, type: 3}

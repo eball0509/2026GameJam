@@ -144,6 +144,10 @@ public class OptionsManager : MonoBehaviour
         {
             helper.RefreshButtonTextDisplay();
         }
+
+        // Inside OptionsManager.cs -> RefreshAllRebindButtonsUI()
+        DynamicControlSign[] signs = Object.FindObjectsByType<DynamicControlSign>();
+        foreach (DynamicControlSign sign in signs) sign.UpdateSignText();
     }
 
     private Key ConvertKeyCodeToInputSystemKey(KeyCode legacyCode)

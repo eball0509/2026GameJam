@@ -19,26 +19,22 @@ public class ExplosiveHazard : MonoBehaviour
 
     private bool hasExploded = false;
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (!hasExploded && collision.gameObject.CompareTag(playerTag))
-        {
-            TriggerExplosion(collision.gameObject);
-        }
-    }
-
-    // Use this instead if your hazard is a Trigger (IsTrigger checked)
-    /*
     private void OnTriggerEnter(Collider other)
     {
-        if (!hasExploded && other.CompareTag(playerTag))
+        if (hasExploded) return;
+
+        // Robust check: Finds PlayerController anywhere in parent/hierarchy 
+        // OR checks the tag, so it never fails due to child colliders.
+        PlayerController hitPlayer = other.GetComponentInParent<PlayerController>();
+        bool isTargetValid = (hitPlayer != null) || (!string.IsNullOrEmpty(playerTag) && other.CompareTag(playerTag));
+
+        if (isTargetValid)
         {
-            TriggerExplosion(other.gameObject);
+            TriggerExplosion(hitPlayer);
         }
     }
-    */
 
-    private void TriggerExplosion(GameObject targetHit)
+    private void TriggerExplosion(PlayerController hitPlayer)
     {
         hasExploded = true;
 
@@ -48,31 +44,27 @@ public class ExplosiveHazard : MonoBehaviour
             Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
         }
 
-        // 2. Find the player and deal damage first so the ragdoll activates
-        PlayerController hitPlayer = targetHit.GetComponentInParent<PlayerController>();
+        // 2. Deal damage and apply force directly to the player if found
         if (hitPlayer != null)
         {
             hitPlayer.TakeDamage(explosionDamage);
 
-            // 3. Immediately apply force directly to the newly activated ragdoll parts.
-            // (We do this directly in case Unity's OverlapSphere needs a physics frame to update)
             Rigidbody[] playerRbs = hitPlayer.GetComponentsInChildren<Rigidbody>();
             foreach (Rigidbody rb in playerRbs)
             {
-                if (!rb.isKinematic) // Ensure we are only applying force to active ragdoll limbs
+                if (!rb.isKinematic)
                 {
                     rb.AddExplosionForce(explosionForce, transform.position, explosionRadius, upwardsModifier, ForceMode.Impulse);
                 }
             }
         }
 
-        // 4. Blast any other physical objects in the area (like boxes or barrels)
+        // 3. Blast any other physical objects in the area (boxes, barrels, etc.)
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
         foreach (Collider hitCollider in colliders)
         {
             Rigidbody rb = hitCollider.GetComponent<Rigidbody>();
 
-            // Ensure we don't double-apply force to the player we just blasted
             if (rb != null)
             {
                 PlayerController potentialPlayer = hitCollider.GetComponentInParent<PlayerController>();
@@ -83,7 +75,7 @@ public class ExplosiveHazard : MonoBehaviour
             }
         }
 
-        // 5. (Optional) Destroy the hazard object so it's gone
+        // 4. (Optional) Destroy the hazard object so it's gone
         // Destroy(gameObject);
     }
 

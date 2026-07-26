@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1791831357000402511}
   - component: {fileID: 5489154689550515818}
   - component: {fileID: 977590002260148014}
+  - component: {fileID: 6169439391352064013}
   m_Layer: 0
   m_Name: SpeedPad
   m_TagString: Untagged
@@ -30,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.56, y: 0.059, z: -6.27}
-  m_LocalScale: {x: 1, y: 0.1, z: 1}
+  m_LocalScale: {x: 1, y: 0.047819, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -127,5 +128,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpeedPad
   peakMaxSpeed: 45
   peakAcceleration: 15
+  holdDuration: 0.6
   decayDuration: 2.5
   launchInPadDirection: 1
+--- !u!114 &6169439391352064013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8401092093122065201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 749ba1ad83c148444bd8b07c98fd8378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProceduralSpeedPad
+  padBaseColor: {r: 0.93819284, g: 1, b: 0, a: 0.6313726}
+  arrowColor: {r: 0, g: 0, b: 0, a: 0.6039216}
+  scrollSpeed: 0.8
+  arrowDensity: 2

@@ -104,7 +104,6 @@ public class GameplayUIManager : MonoBehaviour
 
             // Check your console: If you see this spamming every frame with changing numbers, 
             // the code is 100% working, and the problem is purely visual in the Unity UI.
-            Debug.Log("Timer Text updated to: " + timerText.text);
         }
     }
 

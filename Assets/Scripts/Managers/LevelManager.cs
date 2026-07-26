@@ -1,13 +1,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class LevelManager : MonoBehaviour
 {
     [Header("Level Configuration")]
-    [Tooltip("MUST exactly match the levelName string used on the main menu's LevelMapNode!")]
     public string levelName = "Tutorial";
-
-    [Tooltip("The exact levelName identifier of the NEXT level to unlock when beaten.")]
     public string nextLevelToUnlock = "Easy";
 
     [Header("Medal Targets (Clear Time in Seconds)")]
@@ -18,20 +16,27 @@ public class LevelManager : MonoBehaviour
     [Header("MainMenu System Mapping")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
 
-    private int collectedCount = 0;
+    // Tracks which specific item indices were collected during this runtime session
+    private HashSet<int> collectedIndices = new HashSet<int>();
     private bool isLevelFinished = false;
 
     private void Start()
     {
-        collectedCount = 0;
+        collectedIndices.Clear();
         isLevelFinished = false;
     }
 
-    public void IncrementCollectibleCount()
+    public void TrackSpecificCollectible(int index)
     {
-        collectedCount++;
-        Debug.Log($"Collected: {collectedCount}");
+        if (!collectedIndices.Contains(index))
+        {
+            collectedIndices.Add(index);
+            Debug.Log($"Collected unique item index: {index}");
+        }
     }
+
+    // Deprecated but kept to prevent compilation errors if called elsewhere
+    public void IncrementCollectibleCount() { }
 
     public void CompleteLevel()
     {
@@ -39,15 +44,12 @@ public class LevelManager : MonoBehaviour
         isLevelFinished = true;
 
         float finalTime = 0f;
-
         GameplayUIManager uiManager = FindAnyObjectByType<GameplayUIManager>();
         if (uiManager != null)
         {
             uiManager.StopTimer();
             finalTime = uiManager.elapsedTime;
         }
-
-        Debug.Log($"Level Completed in: {finalTime:F2}s with {collectedCount} items!");
 
         int earnedMedalRank = 0;
         if (finalTime <= goldTimeTarget) earnedMedalRank = 3;
@@ -61,11 +63,19 @@ public class LevelManager : MonoBehaviour
             PlayerPrefs.SetFloat(levelName + "_BestTime", finalTime);
         }
 
-        int currentMaxItems = PlayerPrefs.GetInt(levelName + "_Collectibles", 0);
-        if (collectedCount > currentMaxItems)
+        // SAVE EACH SPECIFIC ITEM PERMANENTLY
+        foreach (int index in collectedIndices)
         {
-            PlayerPrefs.SetInt(levelName + "_Collectibles", collectedCount);
+            PlayerPrefs.SetInt($"{levelName}_Collectible_{index}", 1);
         }
+
+        // Also save a fallback total item count for old compatibility checks
+        int totalUniqueSaved = 0;
+        for (int i = 0; i < 20; i++) // Quick scan cap check
+        {
+            if (PlayerPrefs.GetInt($"{levelName}_Collectible_{i}", 0) == 1) totalUniqueSaved++;
+        }
+        PlayerPrefs.SetInt(levelName + "_Collectibles", totalUniqueSaved);
 
         int currentBestMedal = PlayerPrefs.GetInt(levelName + "_MedalRank", 0);
         if (earnedMedalRank > currentBestMedal)
@@ -78,11 +88,9 @@ public class LevelManager : MonoBehaviour
             PlayerPrefs.SetInt("Unlocked_" + nextLevelToUnlock, 1);
         }
 
-        // Tag this level name so the Main Menu knows to focus back onto it instantly
         PlayerPrefs.SetString("LastPlayedLevel", levelName);
         PlayerPrefs.Save();
 
-        // Load back to menu
         SceneManager.LoadScene(mainMenuSceneName);
     }
 }
